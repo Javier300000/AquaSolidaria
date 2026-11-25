@@ -97,7 +97,7 @@ function stopSession() {
   generation++;
   for (const unsubscribe of unsubscribers) unsubscribe();
   unsubscribers = []; clearInterval(demoTimer); demoTimer = null;
-  role = null; demo = false; device = null; connected = false; offset = 0; history = []; lastSample = null; houseData = null;
+  role = null; demo = false; device = null; connected = false; offset = 0; history = []; lastSample = null; houseData = null; sensorData = null;
   wifiState=null; wifiPending=null; wifiNotice=""; wifiSending=false;
   errorBanner(''); renderDevice(); renderHistory(); renderHouse(null); renderDemoTanks(false);
   closeMenu(); show('shell',false); show('welcome',true);
@@ -153,10 +153,10 @@ function renderHouse(data) {
   // Solo se consulta /viviendas/casa1 o /viviendas/casa2 según el UID.
   // Los nombres de los campos son un contrato previsto para el futuro firmware.
   const recent = data && connected && number(data.ultimaActualizacion) && Math.abs(Date.now()+offset-data.ultimaActualizacion)<=20000;
-  text('houseSupply',recent && typeof data.suministro==='boolean' ? (data.suministro?'Activo':'Inactivo') : 'Sin lectura reciente');
+  text('houseSupply',recent && number(data.frecuenciaHz) ? (data.frecuenciaHz>0?'Flujo detectado':'Sin pulsos en el intervalo') : 'Sin lectura reciente');
   text('houseFloat',recent && typeof data.flotador==='boolean' ? (data.flotador?'Contacto cerrado':'Contacto abierto') : 'Sin lectura reciente');
   text('houseLiters',recent && number(data.litros) ? `${data.litros} L` : '—');
-  text('houseNotice',recent?'Datos recientes de tu vivienda.':'Sin información reciente. Los sensores todavía están pendientes de integración.');
+  text('houseNotice',recent?'Distancia: '+cm(data.distanciaCm)+' · Pulsos desde arranque: '+display(data.pulsos)+' · Bomba manual.':'Sin información reciente.');
 }
 
 // 04. Historial: guarda muestras solo en memoria del navegador, no modifica Firebase.
@@ -232,10 +232,10 @@ function startListeners() {
   listen('.info/connected', value=>{connected=value===true; renderDevice(); if(role?.house&&!connected) renderHouse(null);});
   listen('.info/serverTimeOffset', value=>{offset=number(value)?value:0; renderDevice();});
   if(role.house) listen('viviendas/'+role.house, value=>{houseData=value; renderHouse(value);});
-  else listen('dispositivo', receiveDevice);
+  else { listen('dispositivo', receiveDevice); listen('sensores', value=>{sensorData=value;renderRealSensors();}); }
   if(role.name==='Administrador') listen('wifiControl/estado', value=>{wifiState=value;renderWifi();});
 }
-let houseData = null;
+let houseData = null, sensorData = null;
 async function login(event) {
   event.preventDefault(); if(!firebase) return;
   $('loginButton').disabled=true; loginMessage('Verificando credenciales…');
@@ -333,5 +333,25 @@ async function cambiarWifi(slot){
 }
 $('wifiSwitch1').addEventListener('click',()=>cambiarWifi(1));
 $('wifiSwitch2').addEventListener('click',()=>cambiarWifi(2));
-setInterval(()=>{if(role){renderDevice();renderWifi();if(role.house)renderHouse(houseData);}},1000);
+setInterval(()=>{if(role){renderDevice();renderWifi();if(role.house)renderHouse(houseData);else if(!demo)renderRealSensors();}},1000);
 initFirebase();
+
+// Lecturas reales, independientes del laboratorio de demostración.
+function cm(v){return number(v)?v.toFixed(1)+' cm':'Sin lectura válida';}
+function renderRealSensors(){
+ if(demo||!role||role.house)return;
+ const d=sensorData;
+ const fresh=connected&&number(d?.ultimaActualizacion)&&Math.abs(Date.now()+offset-d.ultimaActualizacion)<=20000;
+ const p=fresh?d.principal||{}:{}, a=fresh?d.casa1||{}:{}, b=fresh?d.casa2||{}:{};
+ tank('mainWater','mainLevel',p.nivel);tank('water1','level1',a.nivel);tank('water2','level2',b.nivel);
+ text('mainLevelNote',cm(p.distanciaCm));text('note1',cm(a.distanciaCm));text('note2',cm(b.distanciaCm));
+ text('availableWater',number(p.volumen)?p.volumen.toFixed(2)+' L':'—');text('waterMetricNote','Volumen sujeto a calibración');
+ text('networkMode',fresh?'Monitoreo manual':'Sin lectura reciente');
+ text('sensorUltra',[p,a,b].map(x=>cm(x.distanciaCm)).join(' / '));
+ const contact=x=>typeof x.flotador==='boolean'?(x.flotador?'Contacto cerrado':'Contacto abierto'):'Sin lectura';
+ text('sensorFloat1',contact(a));text('sensorFloat2',contact(b));
+ const flow=x=>number(x.caudal)?x.caudal.toFixed(2)+' L/min':number(x.pulsos)?x.pulsos+' pulsos (sin calibrar)':'—';
+ text('sensorFlow','V1: '+flow(a)+' · V2: '+flow(b));
+ for(const [i,x] of [[1,a],[2,b]]){text('pump'+i+'State',number(x.frecuenciaHz)?(x.frecuenciaHz>0?'Flujo detectado':'Sin pulsos'):'Sin lectura');$('flow'+i).classList.toggle('active',number(x.frecuenciaHz)&&x.frecuenciaHz>0);$('pumpMark'+i).classList.remove('running');}
+ text('realDistribution',number(a.litros)&&number(b.litros)&&a.litros+b.litros>0?'V1: '+(100*a.litros/(a.litros+b.litros)).toFixed(1)+'% · V2: '+(100*b.litros/(a.litros+b.litros)).toFixed(1)+'% (desde arranque)':'Distribución pendiente de calibración o flujo');
+}
