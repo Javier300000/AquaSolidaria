@@ -1,3 +1,25 @@
+# AquaSolidaria 4.0 — Edición Marea
+
+## Cambios de esta versión
+
+- Navegación superior fija, con menú desplegable debajo de la cabecera en teléfonos.
+- Iconos SVG locales, reutilizados por la función `iconSVG` de `app.js`.
+- Identidad acuática en todas las vistas, temas claro y oscuro, olas, burbujas y reflejos.
+- Se conserva Firebase y la asignación de roles por UID. Los errores de inicio de sesión incluyen causas más específicas; no se restablecen contraseñas.
+- No hay control físico de bombas desde la web. El modo demostración está aislado.
+
+### Cómo estudiar el rediseño
+
+`index.html`: busca `app-header`, `topNavigation` y `data-icon`. `app.js`: sección 01A contiene los SVG, sección 02 genera las opciones de cada rol. `styles.css`: sección 12 documenta la navegación, la identidad visual y las reglas para teléfonos; sustituye las reglas visuales anteriores mediante la cascada CSS.
+
+### Publicación
+
+Sube los cinco archivos a la raíz del repositorio existente, no el ZIP. No publiques el firmware con credenciales. El HTML utiliza `?v=4` para renovar la caché.
+
+# AquaSolidaria 4.0 — Rediseño visual
+
+Se conserva la lógica de la versión 2.0. Los estilos nuevos están documentados en la sección 11 de styles.css. Publica los cinco archivos en la raíz del repositorio. No se agregan permisos ni controles físicos.
+
 # AquaSolidaria Web · versión 2.0
 
 ## 1. Publicación en GitHub Pages (Sublime Text)
@@ -47,3 +69,6 @@ Administrador y operador leen `/dispositivo`. Las cuentas de vivienda leen exclu
 - En `styles.css`, las secciones 07 a 10 documentan el rediseño. `@keyframes` define los movimientos, `transition: height` suaviza los cambios de nivel, y `prefers-reduced-motion` desactiva las animaciones si el usuario lo solicita.
 - En `app.js`, `renderDemoTanks` modifica los niveles y los estados visuales. `renderDevice` actualiza la banda de estado y la señal WiFi. `renderHistory` genera el trazado SVG. La simulación no escribe datos ni envía comandos a Firebase.
 - La configuración pública de Firebase y los UID son los mismos de la versión 1.0. No se incluyen contraseñas.
+
+## Actualización 4.1
+Configuración de conectividad: permite cambiar entre dos perfiles registrados localmente en el ESP32. Requiere firmware y reglas de la versión 4.1. El portal local registra redes nuevas; Firebase no almacena las claves WiFi. No publicar archivos Arduino ni Secretos.h. Los controles de bombas continúan deshabilitados.

@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="es-MX" data-theme="dark">
+<html lang="es-MX" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#083b50">
   <title>AquaSolidaria · Gestión inteligente del agua</title>
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=4">
   <!-- type=module permite importar funciones de Firebase y de nuestros archivos JS. -->
-  <script type="module" src="app.js?v=2"></script>
+  <script type="module" src="app.js?v=4"></script>
 </head>
 <body>
   <!-- 01. PORTADA: visible antes de autenticar. No contiene datos privados. -->
   <div id="welcome" class="welcome">
-    <header class="public-header"><a class="brand" href="#"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C13 9 6 14 6 21a10 10 0 0 0 20 0C26 14 19 9 16 3Z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M10 22c2 4 5 5 9 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>Aqua<span class="accent">Solidaria</span><small>GESTIÓN INTELIGENTE DEL AGUA</small></span></a><button class="ghost" id="themePublic" aria-label="Cambiar tema">◐ Tema</button>
+    <header class="public-header"><a class="brand" href="#"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C13 9 6 14 6 21a10 10 0 0 0 20 0C26 14 19 9 16 3Z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M10 22c2 4 5 5 9 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>Aqua<span class="accent">Solidaria</span><small>GESTIÓN INTELIGENTE DEL AGUA</small></span></a><button class="ghost" id="themePublic" aria-label="Cambiar tema"><span data-icon="theme"></span> Tema</button>
 </header>
     <main class="hero">
-      <div class="intro"><span class="eyebrow"><i></i> TECNOLOGÍA QUE CUIDA EL AGUA</span><h1>Cada gota.<br><em>Un futuro.</em></h1><p>Una manera inteligente de aprovechar el agua de lluvia, supervisar su almacenamiento y distribuirla responsablemente entre dos viviendas.</p>
-<div class="hero-features"><span>◉ Monitoreo en vivo</span><span>↗ Distribución responsable</span><span>⌁ Tecnología ESP32</span>
+      <div class="intro"><span class="eyebrow"><i></i> TECNOLOGÍA QUE CUIDA EL AGUA</span><h1>El agua nos<br><em>conecta.</em></h1><p>Una manera inteligente de aprovechar el agua de lluvia, supervisar su almacenamiento y distribuirla responsablemente entre dos viviendas.</p>
+<div class="hero-features"><span><span data-icon="radar"></span> Monitoreo en vivo</span><span><span data-icon="flow"></span> Distribución responsable</span><span><span data-icon="chip"></span> Tecnología ESP32</span>
 </div>
 <!-- Ilustración original SVG: capas de olas, lluvia, reflejos y viviendas. No depende de imágenes externas. -->
 <div class="art" aria-hidden="true">
@@ -46,60 +46,57 @@
 <span class="art-caption">ILUSTRACIÓN DEL PROYECTO · NO REPRESENTA MEDICIONES</span>
 </div>
 </div>
-      <section class="login panel" aria-labelledby="loginTitle"><span class="eyebrow">PORTAL DE ACCESO</span><h2 id="loginTitle">Tu agua, en control.</h2><p class="muted">Accede a tu espacio de monitoreo con tu cuenta de AquaSolidaria.</p>
+      <section class="login panel" aria-labelledby="loginTitle"><span class="eyebrow">PORTAL DE ACCESO</span><h2 id="loginTitle">Bienvenido a tu centro de agua.</h2><p class="muted">Accede a tu espacio de monitoreo con tu cuenta de AquaSolidaria.</p>
 <form id="loginForm"><label for="email">Correo electrónico</label><input id="email" type="email" autocomplete="username" placeholder="usuario@aquasolidaria.mx" required><label for="password">Contraseña</label>
 <div class="password-wrap"><input id="password" type="password" autocomplete="current-password" required><button type="button" id="showPassword" class="ghost" aria-label="Mostrar contraseña" aria-pressed="false">Ver</button>
-</div><button id="loginButton" class="primary" type="submit" disabled>Iniciar sesión →</button><p id="loginMessage" role="status" class="message">Cargando conexión con Firebase…</p>
+</div><button id="loginButton" class="primary" type="submit" disabled>Iniciar sesión <span data-icon="arrow"></span></button><p id="loginMessage" role="status" class="message">Cargando conexión con Firebase…</p>
 </form>
 <div class="separator">
-</div><button id="demoButton" class="outline" type="button">Explorar demostración visual</button><small class="muted">La demostración no accede a Firebase ni controla equipos.</small>
+</div><button id="demoButton" class="outline" type="button"><span data-icon="waves"></span> Explorar demostración visual</button><small class="muted">La demostración no accede a Firebase ni controla equipos.</small>
 </section>
     </main>
 <footer class="public-footer">AquaSolidaria · Cuidado del agua de lluvia · Proyecto académico 2026</footer>
   </div>
   <!-- 02. APLICACIÓN: el menú se genera de acuerdo al UID del usuario. -->
   <div id="shell" class="shell" hidden>
-    <aside id="sidebar" class="sidebar"><a class="brand" href="#"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C13 9 6 14 6 21a10 10 0 0 0 20 0C26 14 19 9 16 3Z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M10 22c2 4 5 5 9 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>Aqua<span class="accent">Solidaria</span><small>WATER MANAGEMENT</small></span></a><span class="nav-caption">ESPACIO DE TRABAJO</span>
-<nav id="navigation" aria-label="Menú principal">
-</nav>
-<div class="side-bottom"><span class="mini-dot"></span> Prototipo académico <small>Versión 2.0 · Monitoreo</small>
-</div>
-</aside>
-    <div id="overlay" class="overlay" hidden>
-</div>
+    <!-- Barra superior: marca, sesión y navegación. En móvil el menú se abre debajo de la cabecera. -->
+    <header class="app-header">
+      <div class="topbar">
+        <a class="brand" href="#"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C13 9 6 14 6 21a10 10 0 0 0 20 0C26 14 19 9 16 3Z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M9 21c3-3 5 3 8 0s5-3 7-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>Aqua<span class="accent">Solidaria</span><small>GESTIÓN INTELIGENTE DEL AGUA</small></span></a>
+        <div class="top-actions"><span id="connection" class="pill neutral" role="status">Sin lectura</span><div class="identity"><span data-icon="user"></span><strong id="roleLabel">Usuario</strong></div><button id="themeButton" class="ghost icon-button" aria-label="Cambiar tema"><span data-icon="theme"></span></button><button id="logout" class="outline exit-button" aria-label="Cerrar sesión"><span data-icon="logout"></span><span class="exit-label">Salir</span></button><button id="menuToggle" class="ghost mobile icon-button" aria-label="Abrir menú" aria-controls="topNavigation" aria-expanded="false"><span data-icon="menu"></span></button></div>
+      </div>
+      <div id="topNavigation" class="top-navigation"><nav id="navigation" aria-label="Menú principal"></nav><span class="nav-edition"><span data-icon="waves"></span> Edición Marea · 4.0</span></div>
+    </header>
+    <div id="overlay" class="overlay" hidden></div>
     <main class="workspace">
-      <header class="topbar"><button id="menuToggle" class="ghost mobile" aria-label="Abrir menú" aria-expanded="false">☰</button>
-<div><small class="muted">AquaSolidaria / <span id="crumb">General</span></small><strong id="roleLabel">Usuario</strong>
-</div>
-<div class="top-actions"><span id="connection" class="pill neutral" role="status">Sin lectura</span><button id="themeButton" class="ghost" aria-label="Cambiar tema">◐</button><button id="logout" class="outline">Salir</button>
-</div>
-</header>
       <div class="content">
+        <div class="breadcrumb"><span data-icon="drop"></span> AquaSolidaria <span class="crumb-slash">/</span> <span id="crumb">General</span></div>
+
         <div id="demoBanner" class="notice demo" hidden>Modo demostración · Todos los valores de esta sesión son ficticios. No se envían órdenes al ESP32.</div>
         <div id="errorBanner" class="notice error" role="status" hidden>
 </div>
         <!-- 03. RESUMEN: telemetría real de /dispositivo y futuras mediciones. -->
         <section class="page" id="overview">
 <div class="heading">
-<div><span class="eyebrow">CENTRO DE MONITOREO</span><h1>Resumen general<span class="accent">.</span></h1><p class="muted">Supervisa el estado de tu sistema de agua en un solo lugar.</p>
+<div><span class="eyebrow">CENTRO DE MONITOREO</span><h1>Tu sistema de agua<span class="accent">.</span></h1><p class="muted">Supervisa el estado de tu sistema de agua en un solo lugar.</p>
 </div><span id="dateLabel" class="date-chip"></span>
 </div>
           <!-- La banda indica el estado real; no infiere que exista agua circulando. -->
 <div class="system-strip"><span class="status-orb" aria-hidden="true"></span><div><b id="systemHeadline">Esperando telemetría</b><small id="systemDetail">Las mediciones llegarán desde Firebase.</small></div><span class="strip-tag">ESP32 / IoT</span></div>
 <div class="metrics">
-<article class="panel metric"><span class="metric-icon">◉</span><small>Estado del ESP32</small><strong id="deviceState">—</strong><span id="lastUpdate" class="muted">Sin datos</span>
+<article class="panel metric"><span class="metric-icon" data-icon="chip"></span><small>Estado del ESP32</small><strong id="deviceState">—</strong><span id="lastUpdate" class="muted">Sin datos</span>
 </article>
-<article class="panel metric"><span class="metric-icon">⌁</span><small>Señal WiFi</small><strong id="rssi">—</strong><span class="muted">Intensidad recibida</span>
+<article class="panel metric"><span class="metric-icon" data-icon="wifi"></span><small>Señal WiFi</small><strong id="rssi">—</strong><span class="muted">Intensidad recibida</span>
 </article>
-<article class="panel metric"><span class="metric-icon">◷</span><small>Tiempo activo</small><strong id="uptime">—</strong><span class="muted">Desde el último reinicio</span>
+<article class="panel metric"><span class="metric-icon" data-icon="clock"></span><small>Tiempo activo</small><strong id="uptime">—</strong><span class="muted">Desde el último reinicio</span>
 </article>
-<article class="panel metric"><span class="metric-icon">≋</span><small>Agua disponible</small><strong id="availableWater">—</strong><span class="muted" id="waterMetricNote">Pendiente de medición</span>
+<article class="panel metric"><span class="metric-icon" data-icon="drop"></span><small>Agua disponible</small><strong id="availableWater">—</strong><span class="muted" id="waterMetricNote">Pendiente de medición</span>
 </article>
 </div>
           <div class="dashboard-grid">
 <article class="panel network">
 <div class="card-title">
-<div><h2>Red de distribución</h2><p>Esquema del prototipo · objetivo 50/50</p>
+<div><h2 class="icon-heading"><span data-icon="flow"></span> Red de distribución</h2><p>Esquema del prototipo · objetivo 50/50</p>
 </div><span class="pill neutral" id="networkMode">Sin sensores</span>
 </div>
 <div class="network-art">
@@ -114,7 +111,7 @@
 </div>
 <div class="pipes">
 <svg viewBox="0 0 400 90" preserveAspectRatio="none"><path d="M200 0 V36 H100 V90 M200 36 H300 V90" class="pipe-base"/><path id="flow1" d="M200 0 V36 H100 V90" class="pipe-flow"/><path id="flow2" d="M200 0 V36 H300 V90" class="pipe-flow"/>
-</svg><span class="pump-mark one" id="pumpMark1"><span class="impeller">✣</span><small>P1</small></span><span class="pump-mark two" id="pumpMark2"><span class="impeller">✣</span><small>P2</small></span>
+</svg><span class="pump-mark one" id="pumpMark1"><span class="impeller" data-icon="pump"></span><small>P1</small></span><span class="pump-mark two" id="pumpMark2"><span class="impeller" data-icon="pump"></span><small>P2</small></span>
 </div>
 <div class="houses">
 <div class="tank-unit"><span class="house-roof" aria-hidden="true"><svg viewBox="0 0 48 30"><path d="M3 23L24 5l21 18M10 20v7h28v-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
@@ -146,7 +143,7 @@
 </article>
           <article class="panel signal">
 <div class="card-title">
-<div><h2>Calidad de conexión</h2><p>Últimas 30 muestras de esta sesión</p>
+<div><h2 class="icon-heading"><span data-icon="wifi"></span> Calidad de conexión</h2><p>Últimas 30 muestras de esta sesión</p>
 </div>
 </div>
 <div class="signal-summary"><div><small>Intensidad recibida</small><strong id="signalBig">—</strong></div><div id="signalBars" class="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div></div>
@@ -172,21 +169,21 @@
 <div><span class="eyebrow">SENSORES Y ALMACENAMIENTO</span><h1>Monitoreo</h1><p class="muted">Estado de los componentes del prototipo.</p>
 </div>
 </div>
-<div class="panel"><h2>Lecturas de sensores</h2>
+<div class="panel"><h2 class="icon-heading"><span data-icon="radar"></span> Lecturas de sensores</h2>
 <div class="item">
-<div><b>Ultrasónico · tinaco principal</b><small>Porcentaje y volumen después de calibrar</small>
+<span class="item-icon" data-icon="radar"></span><div class="item-copy"><b>Ultrasónico · tinaco principal</b><small>Porcentaje y volumen después de calibrar</small>
 </div><strong id="sensorUltra">Pendiente</strong>
 </div>
 <div class="item">
-<div><b>Flotador · vivienda 1</b><small>Detecta un umbral, no un porcentaje</small>
+<span class="item-icon" data-icon="float"></span><div class="item-copy"><b>Flotador · vivienda 1</b><small>Detecta un umbral, no un porcentaje</small>
 </div><strong id="sensorFloat1">Pendiente</strong>
 </div>
 <div class="item">
-<div><b>Flotador · vivienda 2</b><small>Detecta un umbral, no un porcentaje</small>
+<span class="item-icon" data-icon="float"></span><div class="item-copy"><b>Flotador · vivienda 2</b><small>Detecta un umbral, no un porcentaje</small>
 </div><strong id="sensorFloat2">Pendiente</strong>
 </div>
 <div class="item">
-<div><b>Caudalímetro YF-S401</b><small>Caudal y litros después de calibrar</small>
+<span class="item-icon" data-icon="flow"></span><div class="item-copy"><b>Caudalímetro YF-S401</b><small>Caudal y litros después de calibrar</small>
 </div><strong id="sensorFlow">Pendiente</strong>
 </div>
 </div>
@@ -198,9 +195,9 @@
 </div>
 <div class="notice">El control físico permanece bloqueado hasta instalar y probar las protecciones locales del ESP32.</div>
 <div class="two-grid">
-<article class="panel pump-card"><span class="metric-icon">↗</span><h2>Bomba 1</h2><p>Vivienda 1</p><strong id="pump1State">Sin configurar</strong><button disabled class="outline">Control no habilitado</button>
+<article class="panel pump-card"><span class="metric-icon" data-icon="pump"></span><h2>Bomba 1</h2><p>Vivienda 1</p><strong id="pump1State">Sin configurar</strong><button disabled class="outline">Control no habilitado</button>
 </article>
-<article class="panel pump-card"><span class="metric-icon">↗</span><h2>Bomba 2</h2><p>Vivienda 2</p><strong id="pump2State">Sin configurar</strong><button disabled class="outline">Control no habilitado</button>
+<article class="panel pump-card"><span class="metric-icon" data-icon="pump"></span><h2>Bomba 2</h2><p>Vivienda 2</p><strong id="pump2State">Sin configurar</strong><button disabled class="outline">Control no habilitado</button>
 </article>
 </div>
 </section>
@@ -210,18 +207,18 @@
 </div>
 </div>
 <div class="metrics">
-<article class="panel metric"><small>Estado de suministro</small><strong id="houseSupply">Sin lectura</strong>
+<article class="panel metric"><span class="metric-icon" data-icon="flow"></span><small>Estado de suministro</small><strong id="houseSupply">Sin lectura</strong>
 </article>
-<article class="panel metric"><small>Flotador</small><strong id="houseFloat">Sin lectura</strong>
+<article class="panel metric"><span class="metric-icon" data-icon="float"></span><small>Flotador</small><strong id="houseFloat">Sin lectura</strong>
 </article>
-<article class="panel metric"><small>Litros recibidos</small><strong id="houseLiters">—</strong>
+<article class="panel metric"><span class="metric-icon" data-icon="drop"></span><small>Litros recibidos</small><strong id="houseLiters">—</strong>
 </article>
 </div><p class="notice" id="houseNotice">La información estará disponible cuando se instalen los sensores.</p>
 </section>
         <section id="history" class="page" hidden>
 <div class="heading">
 <div><span class="eyebrow">REGISTROS</span><h1>Historial de conexión</h1><p class="muted">Muestras recibidas durante esta sesión. No es un histórico permanente.</p>
-</div><button id="export" class="primary">Descargar CSV ↓</button>
+</div><button id="export" class="primary"><span data-icon="download"></span> Descargar CSV</button>
 </div>
 <article class="panel table-wrap">
 <table>
@@ -239,9 +236,9 @@
 <div><span class="eyebrow">CENTRO DE AVISOS</span><h1>Alertas</h1>
 </div>
 </div>
-<article class="panel"><h2>Estado de comunicación</h2><p id="alertText">Esperando información.</p>
+<article class="panel"><h2 class="icon-heading"><span data-icon="wifi"></span> Estado de comunicación</h2><p id="alertText">Esperando información.</p>
 </article>
-<article class="panel spaced"><h2>Protecciones de hardware</h2><p class="muted">Pendientes de instalar: nivel mínimo, detección de llenado y parada segura.</p>
+<article class="panel spaced"><h2 class="icon-heading"><span data-icon="shield"></span> Protecciones de hardware</h2><p class="muted">Pendientes de instalar: nivel mínimo, detección de llenado y parada segura.</p>
 </article>
 </section>
         <section id="settings" class="page" hidden>
@@ -249,6 +246,16 @@
 <div><span class="eyebrow">ADMINISTRACIÓN</span><h1>Configuración</h1>
 </div>
 </div>
+<article class="panel wifi-panel spaced">
+  <div class="wifi-heading"><span class="metric-icon" data-icon="wifi"></span><div><span class="eyebrow">CONECTIVIDAD INTELIGENTE</span><h2>Red WiFi del ESP32</h2><p class="muted">Cambia entre redes guardadas sin volver a cargar Arduino.</p></div></div>
+  <div class="wifi-current"><small>Última red reportada</small><strong id="wifiCurrent">—</strong><span id="wifiFresh">Esperando información</span></div>
+  <div class="wifi-profiles">
+    <div><small>PERFIL 01</small><strong id="wifiProfile1">—</strong><button id="wifiSwitch1" class="outline" type="button" disabled><span data-icon="wifi"></span> Usar perfil 1</button></div>
+    <div><small>PERFIL 02</small><strong id="wifiProfile2">—</strong><button id="wifiSwitch2" class="outline" type="button" disabled><span data-icon="wifi"></span> Usar perfil 2</button></div>
+  </div>
+  <p id="wifiStatus" class="wifi-status" role="status" aria-live="polite">Esperando al ESP32 actualizado.</p>
+  <div class="wifi-help"><h3 class="icon-heading"><span data-icon="shield"></span> Registrar otra red</h3><p>Con el ESP32 encendido, mantén BOOT durante 3 segundos. Conéctate a <b>AquaSolidaria-Config</b> usando la clave privada del portal y abre la dirección local.</p><a class="wifi-local" href="http://192.168.4.1/" target="_blank" rel="noopener noreferrer">Abrir configuración local ↗</a><p class="footnote">El portal funciona sin internet. Las contraseñas WiFi se guardan en el ESP32, nunca en Firebase. El cambio remoto necesita una conexión activa. Solo redes personales 2.4 GHz.</p></div>
+</article>
 <article class="panel">
 <dl class="details">
 <div><dt>Proyecto</dt><dd>AquaSolidaria</dd>
@@ -261,11 +268,11 @@
 </div>
 <div><dt>Gestión de cuentas</dt><dd>Consola de Firebase</dd>
 </div>
-</dl><p class="footnote">La configuración de esta etapa es informativa. No modifica parámetros del ESP32.</p>
+</dl><p class="footnote">Los parámetros hidráulicos de esta etapa son informativos.</p>
 </article>
 </section>
       </div>
-<footer class="app-footer">AquaSolidaria · Tecnología para un futuro sostenible</footer>
+<footer class="app-footer"><span data-icon="waves"></span> AquaSolidaria · Cada gota cuenta · Edición Marea 4.1</footer>
     </main>
   </div>
   <noscript>Activa JavaScript para utilizar AquaSolidaria.</noscript>
