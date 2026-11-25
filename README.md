@@ -1,6 +1,15 @@
-# AquaSolidaria Web · versión 1.0
+# AquaSolidaria Web · versión 2.0
 
-## 1. Instalación (Windows / Visual Studio Code)
+## 1. Publicación en GitHub Pages (Sublime Text)
+1. Abre esta carpeta en Sublime Text: File > Open Folder.
+2. En el repositorio existente Javier300000/AquaSolidaria, rama main, elige Add file > Upload files. Sube los cinco archivos de esta carpeta, no la carpeta ni el ZIP. Confirma Commit changes para reemplazar los archivos anteriores.
+3. Espera a que el despliegue de Pages en Actions finalice. Abre https://javier300000.github.io/AquaSolidaria/ y usa Ctrl+F5 si aparece la versión anterior.
+4. Accede con tu usuario habitual. No modifiques el ESP32 ni las reglas de Firebase para este cambio visual.
+
+### Prueba de animaciones
+En la portada elige Explorar demostración visual. Mueve el control de nivel y activa/desactiva las bombas simuladas. Al llegar a 0%, se detiene la animación de circulación. Las dos viviendas muestran valores ilustrativos fijos, no el resultado de un cálculo hidráulico. El modo real no muestra agua sin una medición. Las animaciones respetan la preferencia de movimiento reducido del dispositivo.
+
+### Alternativa: instalación local (Windows / Visual Studio Code)
 1. Descomprime el ZIP y abre la carpeta AquaSolidaria-Web con File > Open Folder.
 2. Instala la extensión Live Server (Ritwick Dey) si no la tienes.
 3. Clic derecho en index.html > Open with Live Server. También puedes ejecutar `python -m http.server 8000` en la terminal si tienes Python y abrir http://localhost:8000.
@@ -32,3 +41,9 @@ Administrador y operador leen `/dispositivo`. Las cuentas de vivienda leen exclu
 - https://firebase.google.com/docs/web/setup
 - https://firebase.google.com/docs/auth/web/password-auth
 - https://firebase.google.com/docs/database/web/read-and-write
+
+## 7. Cómo estudiar las animaciones de la versión 2.0
+- En `index.html`, la ilustración SVG contiene capas de lluvia, olas, tuberías y reflejos. Las clases `sea-front` y `sea-back` se mueven de forma independiente. Los tinacos usan el elemento `.water` con olas y burbujas interiores.
+- En `styles.css`, las secciones 07 a 10 documentan el rediseño. `@keyframes` define los movimientos, `transition: height` suaviza los cambios de nivel, y `prefers-reduced-motion` desactiva las animaciones si el usuario lo solicita.
+- En `app.js`, `renderDemoTanks` modifica los niveles y los estados visuales. `renderDevice` actualiza la banda de estado y la señal WiFi. `renderHistory` genera el trazado SVG. La simulación no escribe datos ni envía comandos a Firebase.
+- La configuración pública de Firebase y los UID son los mismos de la versión 1.0. No se incluyen contraseñas.

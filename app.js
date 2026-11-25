@@ -8,7 +8,8 @@
 // 01. Utilidades y estado de la aplicación.
 const $ = id => document.getElementById(id);
 const text = (id, value) => { $(id).textContent = value; };
-const show = (id, visible) => { $(id).hidden = !visible; };
+// toggleAttribute funciona tanto en HTML como en SVG (por ejemplo la gráfica).
+const show = (id, visible) => { $(id).toggleAttribute('hidden', !visible); };
 const number = v => typeof v === 'number' && Number.isFinite(v);
 const display = v => v == null || v === '' ? '—' : String(v);
 const roles = {
@@ -89,7 +90,16 @@ function renderDevice() {
   const label = state === 'online' ? 'En línea' : state === 'offline' ? 'Sin conexión reciente' : 'Sin lectura';
   text('connection', demo ? 'Demostración' : role?.house ? (connected ? 'Portal conectado' : 'Portal sin conexión') : label);
   $('connection').className = 'pill '+(demo ? 'neutral' : role?.house ? (connected?'online':'offline') : state==='unknown'?'neutral':state);
-  text('deviceState', label);
+  // La banda y el medidor de señal reflejan la frescura de la telemetría.
+  const strip = document.querySelector('.system-strip');
+  strip.dataset.state = demo ? 'unknown' : state;
+  text('systemHeadline', demo ? 'Laboratorio visual · datos ficticios' : state === 'online' ? 'Tu ESP32 está en línea' : state === 'offline' ? 'El ESP32 no tiene lecturas recientes' : 'Esperando telemetría');
+  text('systemDetail', demo ? 'Explora el agua animada sin accionar equipos.' : state === 'online' ? 'Recibiendo información desde Firebase.' : 'Revisa la conexión del dispositivo si el estado persiste.');
+  const signal = number(device?.senal) ? device.senal : null;
+  text('signalBig', signal === null ? '—' : `${signal} dBm`);
+  const bars = signal === null || state !== 'online' ? 0 : signal >= -50 ? 5 : signal >= -60 ? 4 : signal >= -70 ? 3 : signal >= -80 ? 2 : 1;
+  document.querySelectorAll('#signalBars i').forEach((el,i)=>el.classList.toggle('on',i<bars));
+  text('deviceState', demo ? 'Simulado' : label);
   text('lastUpdate', number(device?.ultimaActualizacion) ? 'Última lectura: '+new Date(device.ultimaActualizacion).toLocaleTimeString('es-MX') : 'Sin datos');
   // Si los datos son viejos, se identifican explícitamente como última lectura.
   text('rssi', number(device?.senal) ? `${device.senal} dBm` : '—');
@@ -133,6 +143,8 @@ function renderHistory() {
   const points = recent.map((r,i)=>`${10+320*i/Math.max(1,recent.length-1)},${120-110*Math.max(0,Math.min(1,(r.signal+100)/70))}`);
   if(points.length===1) points.push(points[0].replace(/^10,/, '12,'));
   $('signalLine').setAttribute('points',points.join(' '));
+  // Cerramos el trazado hacia el eje inferior para colorear el área del gráfico.
+  $('signalArea').setAttribute('d', points.length ? `M${points[0].split(',')[0]},120 L${points.join(' L')} L${points[points.length-1].split(',')[0]},120 Z` : '');
 }
 function exportHistory() {
   const rows = ['fecha_iso,senal_dbm,tiempo_activo_segundos', ...history.map(r=>`${new Date(r.time).toISOString()},${r.signal},${number(r.uptime)?r.uptime:''}`)];
@@ -204,19 +216,31 @@ async function login(event) {
 // 06. DEMOSTRACIÓN: valores ficticios, aislados del modo real.
 function tank(waterId, levelId, value) {
   const valid=number(value)&&value>=0&&value<=100;
-  $(waterId).classList.toggle('measured',valid); $(waterId).style.height=valid?`${value}%`:'0%';
+  $(waterId).classList.toggle('measured',valid && value>0); $(waterId).style.height=valid?`${value}%`:'0%';
   text(levelId,valid?`${value}%`:'—');
 }
+// Estado exclusivamente local del laboratorio visual. No se escriben comandos.
+let demoLevel = 73, demoPumps = [true,true];
 function renderDemoTanks(active) {
-  tank('mainWater','mainLevel',active?73:null); tank('water1','level1',active?52:null); tank('water2','level2',active?48:null);
+  const level = active ? demoLevel : null;
+  tank('mainWater','mainLevel',level); tank('water1','level1',active?52:null); tank('water2','level2',active?48:null);
   text('mainLevelNote',active?'Nivel simulado':'Sin medición'); text('note1',active?'Nivel simulado':'Sin lectura'); text('note2',active?'Nivel simulado':'Sin lectura');
-  text('availableWater',active?'2,920 L':'—'); text('networkMode',active?'Simulación':'Sin sensores');
-  $('flow1').classList.toggle('active',active); $('flow2').classList.toggle('active',active);
+  text('availableWater',active?`${(demoLevel*40).toLocaleString('es-MX')} L`:'—'); text('waterMetricNote',active?'Volumen ilustrativo':'Pendiente de medición'); text('networkMode',active?'Simulación':'Sin sensores');
+  show('demoControls',active); $('demoLevel').value=demoLevel; text('demoLevelValue',`${demoLevel}%`);
+  for(let i=0;i<2;i++) {
+    const n=i+1;
+    // En la demostración se detiene la animación si no hay agua en el depósito.
+    const running=active && demoLevel>0 && demoPumps[i];
+    $('flow'+n).classList.toggle('active',running);
+    $('pumpMark'+n).classList.toggle('running',running);
+    $('demoPump'+n).setAttribute('aria-pressed',String(demoPumps[i]));
+    text('demoPump'+n,`Bomba ${n} · ${demoPumps[i]?'ON':'OFF'}`);
+    text('pump'+n+'State',!active?'Sin configurar':running?'Activa (simulada)':demoPumps[i]?'Sin agua (simulado)':'Apagada (simulada)');
+  }
   for(const id of ['sensorUltra','sensorFloat1','sensorFloat2','sensorFlow']) text(id,active?'Simulación':'Pendiente');
-  text('pump1State',active?'Activa (simulada)':'Sin configurar'); text('pump2State',active?'Activa (simulada)':'Sin configurar');
 }
 function startDemo() {
-  stopSession(); demo=true; connected=true;
+  stopSession(); demo=true; connected=true; demoLevel=73; demoPumps=[true,true];
   openShell({name:'Demostración',pages:['overview','monitor','distribution','history','alerts','settings']});
   renderDemoTanks(true); let seconds=0;
   const sample=()=>{seconds+=5; receiveDevice({nombre:'ESP32 de ejemplo',wifi:'Red simulada',ip:'—',senal:-60+Math.round(Math.sin(seconds/12)*6),tiempoActivo:seconds,ultimaActualizacion:Date.now()});};
@@ -237,5 +261,9 @@ $('logout').addEventListener('click',async()=>{if(demo){stopSession();return;}tr
 $('menuToggle').addEventListener('click',()=>{const open=$('sidebar').classList.toggle('open');show('overlay',open);$('menuToggle').setAttribute('aria-expanded',String(open));});
 $('overlay').addEventListener('click',closeMenu); document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
 $('export').addEventListener('click',exportHistory);
+// Los eventos verifican el modo antes de modificar la visualización.
+$('demoLevel').addEventListener('input',e=>{if(demo){demoLevel=Number(e.target.value);renderDemoTanks(true);}});
+for(let i=0;i<2;i++) $('demoPump'+(i+1)).addEventListener('click',()=>{if(demo){demoPumps[i]=!demoPumps[i];renderDemoTanks(true);}});
+$('demoReset').addEventListener('click',()=>{if(demo){demoLevel=73;demoPumps=[true,true];renderDemoTanks(true);}});
 setInterval(()=>{if(role){renderDevice();if(role.house)renderHouse(houseData);}},1000);
 initFirebase();
