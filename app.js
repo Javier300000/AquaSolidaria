@@ -1,1578 +1,1370 @@
 
-// ==========================================
-// AQUASOLIDARIA - PROGRAMA WEB
-// ==========================================
+/*
+ AQUASOLIDARIA - EDICION MAREA
+ Programa principal de la interfaz web.
+ Monitoreo de agua mediante ESP32 y Firebase.
+*/
 
-// 1. FUNCIONES GENERALES
+// ==========================================
+// 01. UTILIDADES Y USUARIOS
+// ==========================================
 
 const $ = id => document.getElementById(id);
-
-const number = value =>
-    typeof value === "number" &&
-    Number.isFinite(value);
-
-const show = (id, visible) => {
-    $(id).hidden = !visible;
-};
-
 const text = (id, value) => {
-    $(id).textContent = value;
+  $(id).textContent = value;
 };
+const show = (id, visible) => {
+  $(id).toggleAttribute('hidden', !visible);
+};
+const number = v =>
+  typeof v === 'number' && Number.isFinite(v);
 
-// Evitar introducir texto no seguro en HTML
-function escapeHTML(value) {
-
-    return String(value ?? "").replace(
-        /[&<>"']/g,
-        char => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        })[char]
-    );
-
-}
-
-// Actualizar HTML solo cuando sea necesario
-function html(id, content) {
-
-    const element = $(id);
-
-    if (element.dataset.rendered !== content) {
-        element.innerHTML = content;
-        element.dataset.rendered = content;
-    }
-
-}
-
-// 2. USUARIOS Y PERMISOS
+const display = v =>
+  v == null || v === '' ? '—' : String(v);
 
 const roles = {
+  '3EzO6T9OXhP1vRfdhvpr7EgKCtC3': {
+    name: 'Administrador',
+    pages: [
+      'overview', 'monitor', 'distribution',
+      'history', 'alerts', 'settings'
+    ]
+  },
 
-    "3EzO6T9OXhP1vRfdhvpr7EgKCtC3": {
+  'E5MLK89eI8XmitvAkcHzAj4mOg42': {
+    name: 'Operador',
+    pages: [
+      'overview', 'monitor', 'distribution',
+      'history', 'alerts'
+    ]
+  },
 
-        name: "Administrador",
+  'vD4sEWQ9ASOAltrggXYku0bAhBz1': {
+    name: 'Vivienda 1',
+    house: 'casa1',
+    pages: ['housing']
+  },
 
-        pages: [
-            "overview",
-            "monitor",
-            "distribution",
-            "history",
-            "alerts",
-            "settings"
-        ]
-
-    },
-
-    "E5MLK89eI8XmitvAkcHzAj4mOg42": {
-
-        name: "Operador",
-
-        pages: [
-            "overview",
-            "monitor",
-            "distribution",
-            "history",
-            "alerts"
-        ]
-
-    },
-
-    "vD4sEWQ9ASOAltrggXYku0bAhBz1": {
-
-        name: "Vivienda 1",
-        house: "casa1",
-        pages: ["housing"]
-
-    },
-
-    "avzzZFclg8h7XGHzvvahg6Fb5WZ2": {
-
-        name: "Vivienda 2",
-        house: "casa2",
-        pages: ["housing"]
-
-    }
-
+  'avzzZFclg8h7XGHzvvahg6Fb5WZ2': {
+    name: 'Vivienda 2',
+    house: 'casa2',
+    pages: ['housing']
+  }
 };
+
+// ==========================================
+// 02. ICONOS SVG
+// ==========================================
+
+const icons = {
+  drop: '<path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z"/><path d="M8 15c1-2 3 2 5 0s3-2 4-1"/>',
+
+  waves: '<path d="M2 6c3 0 3-3 6-3s3 3 6 3 3-3 6-3h2M2 12c3 0 3-3 6-3s3 3 6 3 3-3 6-3h2M2 18c3 0 3-3 6-3s3 3 6 3 3-3 6-3h2"/>',
+
+  overview: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="M17.5 12c-1.4 2-3.5 4-3.5 6a3.5 3.5 0 0 0 7 0c0-2-2.1-4-3.5-6Z"/>',
+
+  radar: '<path d="M4 8a11 11 0 0 1 16 0M7 11a7 7 0 0 1 10 0M10 14a3 3 0 0 1 4 0"/><rect x="5" y="16" width="14" height="5" rx="2"/><path d="M8 19h8"/>',
+
+  flow: '<path d="M12 3v6H5v10m7-10h7v10M2 16l3 3 3-3m8 0 3 3 3-3"/><circle cx="12" cy="3" r="1"/>',
+
+  history: '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 12h2m-2 5h2m3-5h3m-3 5h3"/>',
+
+  bell: '<path d="M18 8a6 6 0 1 0-12 0c0 6-3 7-3 9h18c0-2-3-3-3-9M10 21h4"/>',
+
+  settings: '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="var(--panel)"/><circle cx="15" cy="12" r="2" fill="var(--panel)"/><circle cx="8" cy="18" r="2" fill="var(--panel)"/>',
+
+  home: '<path d="M3 11 12 3l9 8M5 10v11h14V10"/><path d="M12 12c-2 3-3 4-3 5a3 3 0 0 0 6 0c0-1-1-2-3-5Z"/>',
+
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
+
+  theme: '<path d="M12 3a9 9 0 1 0 9 9A7 7 0 0 1 12 3Z"/><path d="M18 3v4m-2-2h4"/>',
+
+  logout: '<path d="M10 4H4v16h6m4-13 5 5-5 5M9 12h10"/>',
+
+  menu: '<path d="M3 6h18M3 12h18M3 18h18"/>',
+
+  arrow: '<path d="M4 12h15m-6-6 6 6-6 6"/>',
+
+  download: '<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
+
+  chip: '<rect x="5" y="5" width="14" height="14" rx="3"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3"/>',
+
+  wifi: '<path d="M2 8a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0m-11 4a5 5 0 0 1 8 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/>',
+
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>',
+
+  pump: '<circle cx="12" cy="12" r="9"/><path d="M12 12c-7 0-5-8 0-5 2 1 0 5 0 5Zm0 0c4-6 10-1 5 2-2 1-5-2-5-2Zm0 0c4 6-3 10-5 5-1-2 5-5 5-5Z"/>',
+
+  float: '<path d="M12 2v20M6 5h12M4 18c3-3 5 3 8 0s5 3 8 0"/><rect x="7" y="9" width="10" height="6" rx="3" fill="var(--panel)"/>',
+
+  shield: '<path d="M12 3 4 6v6c0 4 4 7 8 9 4-2 8-5 8-9V6Z"/><path d="m8 12 3 3 5-6"/>'
+};
+
+function iconSVG(name) {
+  return `
+    <svg viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="1.7"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true"
+         focusable="false">
+      ${icons[name] || icons.drop}
+    </svg>
+  `;
+}
+
+document.querySelectorAll('[data-icon]')
+  .forEach(el => {
+    el.innerHTML = iconSVG(el.dataset.icon);
+  });
+
+// ==========================================
+// 03. NAVEGACION
+// ==========================================
 
 const pages = {
-
-    overview: "⌂ Inicio",
-    monitor: "💧 Tinacos y sensores",
-    distribution: "↔ Distribución",
-    history: "▤ Historial",
-    alerts: "⚠ Alertas",
-    settings: "⚙ Información",
-    housing: "⌂ Mi vivienda"
-
+  overview: ['overview', 'Inicio'],
+  monitor: ['radar', 'Tinacos y sensores'],
+  distribution: ['flow', 'Distribución'],
+  history: ['history', 'Historial'],
+  alerts: ['bell', 'Alertas'],
+  settings: ['settings', 'Configuración'],
+  housing: ['home', 'Mi vivienda']
 };
 
-// 3. VARIABLES DE FUNCIONAMIENTO
-
 let firebase = null;
-
 let role = null;
+let demo = false;
 let device = null;
-let sensors = null;
-let houseData = null;
-
 let connected = false;
-let serverOffset = 0;
 
+let offset = 0;
 let history = [];
-let lastSample = null;
-
 let unsubscribers = [];
 let generation = 0;
 
-let demo = false;
+let lastSample = null;
 let demoTimer = null;
+let houseData = null;
+let sensorData = null;
 
-let signingIn = false;
-
-// 4. MENSAJES
-
-function loginMessage(message, error = false) {
-
-    text("loginMessage", message);
-
-    $("loginMessage").classList.toggle(
-        "error", error
-    );
-
+function closeMenu() {
+  $('topNavigation').classList.remove('open');
+  show('overlay', false);
+  $('menuToggle').setAttribute(
+    'aria-expanded', 'false'
+  );
 }
-
-function errorBanner(message) {
-
-    text("errorBanner", message);
-
-    show("errorBanner", Boolean(message));
-
-}
-
-// 5. NAVEGACION
 
 function go(page) {
+  if (!role?.pages.includes(page)) return;
 
-    if (!role?.pages.includes(page)) return;
+  document.querySelectorAll('.page')
+    .forEach(el => {
+      el.hidden = el.id !== page;
+    });
 
-    document.querySelectorAll(".page")
-        .forEach(section => {
+  document.querySelectorAll('.nav-link')
+    .forEach(el => {
+      const active = el.dataset.page === page;
 
-            section.hidden = section.id !== page;
+      el.classList.toggle('active', active);
 
-        });
+      if (active) {
+        el.setAttribute('aria-current', 'page');
+      } else {
+        el.removeAttribute('aria-current');
+      }
+    });
 
-    document.querySelectorAll(".nav-button")
-        .forEach(button => {
-
-            button.classList.toggle(
-                "active",
-                button.dataset.page === page
-            );
-
-        });
-
-    window.scrollTo(0, 0);
-
+  text('crumb', pages[page][1]);
+  closeMenu();
+  window.scrollTo(0, 0);
 }
 
 function openShell(selectedRole) {
+  role = selectedRole;
 
-    role = selectedRole;
+  text('roleLabel', role.name);
 
-    text("roleLabel", role.name);
+  $('navigation').replaceChildren();
 
-    $("navigation").replaceChildren();
+  for (const id of role.pages) {
+    const btn = document.createElement('button');
+    btn.className = 'nav-link';
+    btn.dataset.page = id;
 
-    for (const page of role.pages) {
+    const symbol = document.createElement('span');
+    symbol.className = 'nav-icon';
+    symbol.innerHTML = iconSVG(pages[id][0]);
 
-        const button = document.createElement(
-            "button"
-        );
+    symbol.setAttribute('aria-hidden', 'true');
 
-        button.className = "nav-button";
-        button.dataset.page = page;
-        button.textContent = pages[page];
+    btn.append(
+      symbol,
+      document.createTextNode(pages[id][1])
+    );
 
-        button.addEventListener(
-            "click", () => go(page)
-        );
+    btn.addEventListener('click', () => go(id));
 
-        $("navigation").append(button);
+    $('navigation').append(btn);
+  }
 
-    }
+  show('welcome', false);
+  show('shell', true);
+  show('demoBanner', demo);
 
-    show("welcome", false);
-    show("shell", true);
-    show("demoBanner", demo);
+  text(
+    'dateLabel',
+    new Intl.DateTimeFormat(
+      'es-MX', { dateStyle: 'long' }
+    ).format(new Date())
+  );
 
-    if (role.house) {
-        text("houseTitle", role.name);
-    }
+  if (role.house) {
+    text('houseTitle', role.name);
+  }
 
-    go(role.pages[0]);
+  go(role.pages[0]);
 
-    render();
-
+  if (!demo && !role.house) {
+    renderRealSensors();
+  }
 }
 
-// 6. LIMPIAR SESIONES
+// ==========================================
+// 04. CONTROL DE SESIONES
+// ==========================================
+
+function loginMessage(message, failed = false) {
+  text('loginMessage', message);
+  $('loginMessage').classList.toggle(
+    'fail', failed
+  );
+}
+
+function errorBanner(message) {
+  text('errorBanner', message);
+  show('errorBanner', Boolean(message));
+}
 
 function stopSession() {
+  generation++;
 
-    generation++;
+  for (const unsubscribe of unsubscribers) {
+    unsubscribe();
+  }
 
-    for (const unsubscribe of unsubscribers) {
-        unsubscribe();
-    }
+  unsubscribers = [];
 
-    unsubscribers = [];
+  clearInterval(demoTimer);
+  demoTimer = null;
 
-    clearInterval(demoTimer);
-    demoTimer = null;
+  role = null;
+  demo = false;
+  device = null;
+  connected = false;
+  offset = 0;
+  history = [];
+  lastSample = null;
+  houseData = null;
+  sensorData = null;
 
-    role = null;
-    device = null;
-    sensors = null;
-    houseData = null;
+  errorBanner('');
 
-    connected = false;
-    serverOffset = 0;
+  renderDevice();
+  renderHistory();
+  renderHouse(null);
+  renderDemoTanks(false);
 
-    history = [];
-    lastSample = null;
+  text(
+    'realDistribution',
+    'Distribución pendiente de calibración o flujo'
+  );
 
-    demo = false;
-
-    errorBanner("");
-
-    // Evitar que los datos de una cuenta
-    // permanezcan visibles en otra sesion.
-
-    const ids = [
-        "mainTank",
-        "homeTank1",
-        "homeTank2",
-        "sensorCards",
-        "distributionCards",
-        "personalTank",
-        "personalSensors",
-        "alertList"
-    ];
-
-    for (const id of ids) {
-        html(id, "");
-    }
-
-    $("historyRows").replaceChildren();
-    show("historyEmpty", true);
-
-    show("shell", false);
-    show("welcome", true);
-
+  closeMenu();
+  show('shell', false);
+  show('welcome', true);
 }
 
-// 7. VERIFICAR DATOS RECIENTES
+// ==========================================
+// 05. ESTADO DEL ESP32
+// ==========================================
 
-function fresh(data) {
+function freshness() {
+  if (!device ||
+      !number(device.ultimaActualizacion)) {
+    return 'unknown';
+  }
 
-    if (!data || !number(data.ultimaActualizacion)) {
-        return false;
-    }
+  if (!connected && !demo) {
+    return 'offline';
+  }
 
-    if (!demo && !connected) {
-        return false;
-    }
+  const age =
+    Date.now() + offset -
+    device.ultimaActualizacion;
 
-    const age =
-        Date.now() +
-        serverOffset -
-        data.ultimaActualizacion;
-
-    return age >= -5000 && age <= 20000;
-
-}
-
-function date(value) {
-
-    return number(value)
-        ? new Date(value).toLocaleString("es-MX")
-        : "Sin lectura";
-
+  return age >= -5000 && age <= 20000
+    ? 'online'
+    : 'offline';
 }
 
 function duration(seconds) {
+  if (!number(seconds) || seconds < 0) {
+    return '—';
+  }
 
-    if (!number(seconds) || seconds < 0) {
-        return "—";
-    }
+  const s = Math.floor(seconds);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor(s % 3600 / 60);
 
-    const total = Math.floor(seconds);
-
-    const h = Math.floor(total / 3600);
-    const m = Math.floor(total % 3600 / 60);
-    const s = total % 60;
-
-    return `${h} h ${m} min ${s} s`;
-
+  return `${h ? h + ' h ' : ''}${m ? m + ' min ' : ''}${s % 60} s`;
 }
-
-// 8. INTERPRETACION DE LOS SENSORES
-
-function distance(data = {}) {
-
-    if (
-        number(data.distanciaCm) &&
-        data.distanciaCm >= 0
-    ) {
-        return data.distanciaCm.toFixed(1) + " cm";
-    }
-
-    switch (data.estadoUltrasonico) {
-
-        case "zona_ciega":
-            return "Zona ciega del sensor";
-
-        case "sin_eco":
-            return "Sin respuesta ECHO";
-
-        case "fuera_rango":
-            return "Fuera de rango";
-
-        default:
-            return "Sin lectura válida";
-
-    }
-
-}
-
-function floatState(data = {}) {
-
-    if (data.lleno === true) {
-        return "Lleno según flotador";
-    }
-
-    if (data.lleno === false) {
-        return "Debajo del umbral de llenado";
-    }
-
-    if (typeof data.flotador === "boolean") {
-
-        return data.flotador
-            ? "Contacto cerrado · Sin calibrar"
-            : "Contacto abierto · Sin calibrar";
-
-    }
-
-    return "Sin lectura";
-
-}
-
-function capacity(data = {}) {
-
-    if (!number(data.capacidadLitros)) {
-        return "Por calibrar";
-    }
-
-    if (data.capacidadLitros < 1) {
-
-        return (
-            Math.round(data.capacidadLitros * 1000)
-            + " ml"
-        );
-
-    }
-
-    return data.capacidadLitros.toFixed(2) + " L";
-
-}
-
-function liters(value) {
-
-    if (!number(value) || value < 0) {
-        return "Sin calibrar";
-    }
-
-    return value.toFixed(3) + " L";
-
-}
-
-function flow(data = {}) {
-
-    if (number(data.caudal)) {
-        return data.caudal.toFixed(3) + " L/min";
-    }
-
-    if (number(data.frecuenciaHz)) {
-
-        return data.frecuenciaHz > 0
-            ? "Pulsos detectados"
-            : "Sin pulsos en el intervalo";
-
-    }
-
-    return "Sin lectura";
-
-}
-
-function percentage(data = {}) {
-
-    return (
-        number(data.nivel) &&
-        data.nivel >= 0 &&
-        data.nivel <= 100
-    ) ? data.nivel : null;
-
-}
-
-// 9. DISEÑO DE LOS TINACOS
-
-function tankMarkup(name, data = {}) {
-
-    const level = percentage(data);
-
-    // Un flotador permite detectar el umbral
-    // de llenado, pero no un porcentaje exacto.
-
-    const full = data.lleno === true;
-
-    const height = level === null ? 0 : level;
-
-    const label = level !== null
-        ? Math.round(level) + "%"
-        : full ? "Lleno" : "—";
-
-    let state = "Nivel sin calibrar";
-
-    if (full) {
-
-        state = "Umbral de llenado alcanzado";
-
-    } else if (data.lleno === false) {
-
-        state = "Debajo del umbral";
-
-    } else if (level !== null) {
-
-        state = "Nivel medido";
-
-    } else if (!number(data.distanciaCm)) {
-
-        state = "Sin nivel válido";
-
-    }
-
-    return `
-        <div class="tank-unit">
-
-            <div class="tank">
-
-                <div class="tank-water"
-                     style="height:${height}%"
-                     ${height === 0 ? "hidden" : ""}>
-                </div>
-
-                <div class="tank-value">
-                    ${escapeHTML(label)}
-                </div>
-
-            </div>
-
-            <h3>${escapeHTML(name)}</h3>
-
-            <span class="tank-status
-                ${full ? "full-tank" : ""}">
-
-                ${escapeHTML(state)}
-
-            </span>
-
-            <small>
-                ${escapeHTML(distance(data))}
-            </small>
-
-        </div>
-    `;
-
-}
-
-function infoRow(name, value) {
-
-    return `
-        <div class="info-row">
-
-            <span>${escapeHTML(name)}</span>
-
-            <strong>
-                ${escapeHTML(value)}
-            </strong>
-
-        </div>
-    `;
-
-}
-
-function sensorCard(name, data = {}, house = false) {
-
-    return `
-        <article class="panel sensor-card">
-
-            <h3>${escapeHTML(name)}</h3>
-
-            <div class="sensor-value">
-                ${escapeHTML(distance(data))}
-            </div>
-
-            ${infoRow("Capacidad", capacity(data))}
-
-            ${infoRow(
-                "Nivel",
-                percentage(data) === null
-                    ? "Por calibrar"
-                    : Math.round(data.nivel) + "%"
-            )}
-
-            ${infoRow(
-                "Volumen almacenado",
-                liters(data.volumen)
-            )}
-
-            ${
-                house
-                ? infoRow("Flotador", floatState(data))
-                  + infoRow("Caudal", flow(data))
-                  + infoRow(
-                      "Pulsos desde arranque",
-                      number(data.pulsos)
-                          ? data.pulsos
-                          : "—"
-                  )
-                  + infoRow(
-                      "Agua recibida",
-                      liters(data.litros)
-                  )
-                : ""
-            }
-
-        </article>
-    `;
-
-}
-
-function branchCard(name, data = {}) {
-
-    return `
-        <article class="panel sensor-card">
-
-            <h3>${escapeHTML(name)}</h3>
-
-            ${infoRow("Flujo", flow(data))}
-
-            ${infoRow(
-                "Frecuencia",
-                number(data.frecuenciaHz)
-                    ? data.frecuenciaHz.toFixed(2) + " Hz"
-                    : "—"
-            )}
-
-            ${infoRow(
-                "Pulsos",
-                number(data.pulsos)
-                    ? data.pulsos
-                    : "—"
-            )}
-
-            ${infoRow(
-                "Litros distribuidos",
-                liters(data.litros)
-            )}
-
-            ${infoRow(
-                "Flotador",
-                floatState(data)
-            )}
-
-        </article>
-    `;
-
-}
-
-// 10. MOSTRAR ESTADO DEL ESP32
 
 function renderDevice() {
+  const state = freshness();
 
-    const recent = fresh(device);
+  const label = state === 'online'
+    ? 'En línea'
+    : state === 'offline'
+      ? 'Sin conexión reciente'
+      : 'Sin lectura';
 
-    const label = demo
-        ? "Demostración"
-        : recent
-            ? "En línea"
-            : device
-                ? "Sin datos recientes"
-                : "Esperando ESP32";
+  text(
+    'connection',
+    demo
+      ? 'Demostración'
+      : role?.house
+        ? connected
+          ? 'Portal conectado'
+          : 'Portal sin conexión'
+        : label
+  );
 
-    text("connection", label);
-
-    $("connection").className =
-        "status " +
-        (
-            demo
-            ? ""
-            : recent
-                ? "online"
-                : device ? "offline" : ""
-        );
-
-    text("deviceState", label);
-
-    text(
-        "rssi",
-        recent && number(device?.senal)
-            ? device.senal + " dBm"
-            : "—"
+  $('connection').className =
+    'pill ' +
+    (
+      demo
+        ? 'neutral'
+        : role?.house
+          ? connected ? 'online' : 'offline'
+          : state === 'unknown'
+            ? 'neutral'
+            : state
     );
 
-    text(
-        "uptime",
-        recent
-            ? duration(device.tiempoActivo)
-            : "—"
-    );
+  const strip =
+    document.querySelector('.system-strip');
 
-    text(
-        "wifiName",
-        recent
-            ? device.wifi || "—"
-            : "Sin lectura reciente"
-    );
+  strip.dataset.state =
+    demo ? 'unknown' : state;
 
-    text(
-        "ipAddress",
-        recent ? device.ip || "—" : "—"
-    );
+  text(
+    'systemHeadline',
+    demo
+      ? 'Laboratorio visual · datos ficticios'
+      : state === 'online'
+        ? 'Tu ESP32 está en línea'
+        : state === 'offline'
+          ? 'El ESP32 no tiene lecturas recientes'
+          : 'Esperando telemetría'
+  );
 
-    text(
-        "lastUpdate",
-        date(device?.ultimaActualizacion)
-    );
+  text(
+    'systemDetail',
+    demo
+      ? 'Explora el agua animada sin accionar equipos.'
+      : state === 'online'
+        ? 'Recibiendo información desde Firebase.'
+        : 'Revisa la conexión del dispositivo si el estado persiste.'
+  );
 
+  const signal = number(device?.senal)
+    ? device.senal
+    : null;
+
+  text(
+    'signalBig',
+    signal === null ? '—' : `${signal} dBm`
+  );
+
+  const bars =
+    signal === null || state !== 'online'
+      ? 0
+      : signal >= -50 ? 5
+      : signal >= -60 ? 4
+      : signal >= -70 ? 3
+      : signal >= -80 ? 2
+      : 1;
+
+  document.querySelectorAll('#signalBars i')
+    .forEach((el, i) => {
+      el.classList.toggle('on', i < bars);
+    });
+
+  text('deviceState', demo ? 'Simulado' : label);
+
+  text(
+    'lastUpdate',
+    number(device?.ultimaActualizacion)
+      ? 'Última lectura: ' +
+        new Date(
+          device.ultimaActualizacion
+        ).toLocaleTimeString('es-MX')
+      : 'Sin datos'
+  );
+
+  text(
+    'rssi',
+    number(device?.senal)
+      ? `${device.senal} dBm`
+      : '—'
+  );
+
+  text('uptime', duration(device?.tiempoActivo));
+  text('wifiName', display(device?.wifi));
+  text('ipAddress', display(device?.ip));
+  text('deviceName', display(device?.nombre));
+
+  text(
+    'alertText',
+    state === 'online'
+      ? 'Se reciben actualizaciones recientes del ESP32.'
+      : state === 'offline'
+        ? 'No hay datos recientes. Revisa la alimentación, internet o Firebase.'
+        : 'Aún no hay lecturas del dispositivo.'
+  );
 }
-
-// 11. MOSTRAR MEDICIONES REALES
-
-function renderSensors() {
-
-    const recent = fresh(sensors);
-
-    const principal = recent
-        ? sensors.principal || {}
-        : {};
-
-    const casa1 = recent
-        ? sensors.casa1 || {}
-        : {};
-
-    const casa2 = recent
-        ? sensors.casa2 || {}
-        : {};
-
-    html(
-        "mainTank",
-        tankMarkup("Tinaco principal", principal)
-    );
-
-    html(
-        "homeTank1",
-        tankMarkup("Vivienda 1", casa1)
-    );
-
-    html(
-        "homeTank2",
-        tankMarkup("Vivienda 2", casa2)
-    );
-
-    text(
-        "availableWater",
-        number(principal.volumen)
-            ? liters(principal.volumen)
-            : "—"
-    );
-
-    html(
-        "sensorCards",
-
-        sensorCard(
-            "Tinaco principal", principal
-        ) +
-
-        sensorCard(
-            "Vivienda 1", casa1, true
-        ) +
-
-        sensorCard(
-            "Vivienda 2", casa2, true
-        )
-    );
-
-    renderDistribution(casa1, casa2);
-
-    renderAlerts(
-        principal,
-        casa1,
-        casa2,
-        recent
-    );
-
-}
-
-// 12. DISTRIBUCION DE AGUA
-
-function renderDistribution(casa1, casa2) {
-
-    html(
-        "distributionCards",
-
-        branchCard("Ramal 1", casa1) +
-        branchCard("Ramal 2", casa2)
-    );
-
-    const l1 = casa1.litros;
-    const l2 = casa2.litros;
-
-    if (
-        number(l1) &&
-        number(l2) &&
-        l1 >= 0 &&
-        l2 >= 0 &&
-        l1 + l2 > 0
-    ) {
-
-        const p1 = l1 / (l1 + l2) * 100;
-
-        const p2 = 100 - p1;
-
-        $("share1").style.width = p1 + "%";
-        $("share2").style.width = p2 + "%";
-
-        text(
-            "distributionText",
-            `Vivienda 1: ${p1.toFixed(1)}% · ` +
-            `Vivienda 2: ${p2.toFixed(1)}%`
-        );
-
-    } else {
-
-        $("share1").style.width = "0%";
-        $("share2").style.width = "0%";
-
-        text(
-            "distributionText",
-            "Pendiente de calibración o flujo"
-        );
-
-    }
-
-}
-
-// 13. SISTEMA DE ALERTAS
-
-function renderAlerts(principal, casa1, casa2, recent) {
-
-    const alerts = [];
-
-    function add(message, danger = false) {
-
-        alerts.push(
-            `<div class="notice ${danger ? "danger" : ""}">
-                ${escapeHTML(message)}
-            </div>`
-        );
-
-    }
-
-    if (!fresh(device)) {
-
-        add(
-            "No se reciben datos recientes del ESP32. " +
-            "Verifica la conexión y la alimentación.",
-            true
-        );
-
-    }
-
-    if (!recent) {
-
-        add(
-            "No hay mediciones recientes de los sensores.",
-            true
-        );
-
-    } else {
-
-        if (casa1.lleno === true) {
-
-            add(
-                "Vivienda 1: umbral de llenado alcanzado. " +
-                "Apaga manualmente la bomba.",
-                true
-            );
-
-        }
-
-        if (casa2.lleno === true) {
-
-            add(
-                "Vivienda 2: umbral de llenado alcanzado. " +
-                "Apaga manualmente la bomba.",
-                true
-            );
-
-        }
-
-        const tanks = [
-            ["Tinaco principal", principal],
-            ["Vivienda 1", casa1],
-            ["Vivienda 2", casa2]
-        ];
-
-        for (const [name, data] of tanks) {
-
-            if (!number(data.distanciaCm)) {
-
-                add(
-                    name + ": " + distance(data) +
-                    ". Revisa la posición y conexiones " +
-                    "del ultrasónico."
-                );
-
-            }
-
-        }
-
-        if (
-            percentage(principal) !== null &&
-            principal.nivel <= 10
-        ) {
-
-            add(
-                "Nivel bajo en el tinaco principal. " +
-                "Evita operar la bomba sin agua.",
-                true
-            );
-
-        }
-
-    }
-
-    if (alerts.length === 0) {
-
-        add("Sin alertas activas según los datos recibidos.");
-
-    }
-
-    html("alertList", alerts.join(""));
-
-}
-
-// 14. PANEL INDIVIDUAL DE VIVIENDA
-
-function renderHouse() {
-
-    const recent = fresh(houseData);
-
-    const data = recent ? houseData : {};
-
-    text(
-        "connection",
-
-        recent
-            ? "Datos recientes"
-            : "Sin lectura reciente"
-    );
-
-    $("connection").className =
-        "status " + (recent ? "online" : "offline");
-
-    html(
-        "personalTank",
-        tankMarkup(role.name, data)
-    );
-
-    html(
-        "personalSensors",
-
-        sensorCard(
-            "Monitoreo de mi vivienda",
-            data,
-            true
-        ) +
-
-        (
-            data.lleno === true
-            ? `<article class="panel">
-                   <h3>Umbral de llenado alcanzado</h3>
-                   <p>El flotador detectó el llenado.
-                   Si la bomba está funcionando,
-                   solicita su apagado manual.</p>
-               </article>`
-            : ""
-        )
-    );
-
-}
-
-// 15. FUNCION GENERAL DE VISUALIZACION
-
-function render() {
-
-    if (!role) return;
-
-    if (role.house) {
-
-        renderHouse();
-
-    } else {
-
-        renderDevice();
-
-        renderSensors();
-
-    }
-
-}
-
-// 16. HISTORIAL DE CONEXION
 
 function receiveDevice(value) {
+  device = value;
+  renderDevice();
 
-    device = value;
+  if (
+    number(value?.ultimaActualizacion) &&
+    number(value?.senal) &&
+    value.ultimaActualizacion !== lastSample
+  ) {
+    lastSample = value.ultimaActualizacion;
 
-    if (
+    history.push({
+      time: value.ultimaActualizacion,
+      signal: value.senal,
+      uptime: value.tiempoActivo
+    });
 
-        number(value?.ultimaActualizacion) &&
-        number(value?.senal) &&
-        value.ultimaActualizacion !== lastSample
-
-    ) {
-
-        lastSample = value.ultimaActualizacion;
-
-        history.push({
-
-            time: value.ultimaActualizacion,
-            signal: value.senal,
-            uptime: value.tiempoActivo
-
-        });
-
-        if (history.length > 200) {
-
-            history.shift();
-
-        }
-
-        renderHistory();
-
+    if (history.length > 200) {
+      history.shift();
     }
 
-    render();
-
+    renderHistory();
+  }
 }
 
+// ==========================================
+// 06. PORTAL DE CADA VIVIENDA
+// ==========================================
+
+function renderHouse(data) {
+  const recent =
+    data &&
+    connected &&
+    number(data.ultimaActualizacion) &&
+    Math.abs(
+      Date.now() + offset -
+      data.ultimaActualizacion
+    ) <= 20000;
+
+  text(
+    'houseSupply',
+    recent && number(data.frecuenciaHz)
+      ? data.frecuenciaHz > 0
+        ? 'Flujo detectado'
+        : 'Sin pulsos en el intervalo'
+      : 'Sin lectura reciente'
+  );
+
+  text(
+    'houseFloat',
+    recent
+      ? estadoFlotador(data)
+      : 'Sin lectura reciente'
+  );
+
+  text(
+    'houseLiters',
+    recent && number(data.litros)
+      ? `${data.litros} L`
+      : '—'
+  );
+
+  text(
+    'houseNotice',
+    recent
+      ? 'Distancia: ' + estadoDistancia(data) +
+        ' · ' + estadoFlotador(data) +
+        (
+          number(data.capacidadLitros)
+            ? ' · Capacidad: ' +
+              data.capacidadLitros + ' L'
+            : ''
+        ) +
+        ' · Pulsos desde arranque: ' +
+        display(data.pulsos) +
+        ' · Bomba manual.'
+      : 'Sin información reciente.'
+  );
+}
+
+// ==========================================
+// 07. HISTORIAL Y GRAFICA WIFI
+// ==========================================
+
 function renderHistory() {
+  const rows = $('historyRows');
+  rows.replaceChildren();
 
-    const rows = $("historyRows");
+  for (const entry of [...history].reverse()) {
+    const tr = document.createElement('tr');
 
-    rows.replaceChildren();
-
-    for (const item of [...history].reverse()) {
-
-        const tr = document.createElement("tr");
-
-        const values = [
-            date(item.time),
-            item.signal + " dBm",
-            duration(item.uptime)
-        ];
-
-        for (const value of values) {
-
-            const td = document.createElement("td");
-
-            td.textContent = value;
-
-            tr.append(td);
-
-        }
-
-        rows.append(tr);
-
+    for (const value of [
+      new Date(entry.time).toLocaleString('es-MX'),
+      `${entry.signal} dBm`,
+      duration(entry.uptime)
+    ]) {
+      const td = document.createElement('td');
+      td.textContent = value;
+      tr.append(td);
     }
 
-    show("historyEmpty", history.length === 0);
+    rows.append(tr);
+  }
 
+  show('historyEmpty', history.length === 0);
+  show('signalChart', history.length > 0);
+  show('chartEmpty', history.length === 0);
+
+  const recent = history.slice(-30);
+
+  const points = recent.map((r, i) => {
+    const x =
+      10 + 320 * i / Math.max(1, recent.length - 1);
+
+    const y =
+      120 - 110 *
+      Math.max(0, Math.min(1, (r.signal + 100) / 70));
+
+    return `${x},${y}`;
+  });
+
+  if (points.length === 1) {
+    points.push(
+      points[0].replace(/^10,/, '12,')
+    );
+  }
+
+  $('signalLine').setAttribute(
+    'points', points.join(' ')
+  );
+
+  $('signalArea').setAttribute(
+    'd',
+    points.length
+      ? `M${points[0].split(',')[0]},120 L${points.join(' L')} L${points[points.length - 1].split(',')[0]},120 Z`
+      : ''
+  );
 }
 
 function exportHistory() {
+  const rows = [
+    'fecha_iso,senal_dbm,tiempo_activo_segundos',
 
-    const rows = [
+    ...history.map(r =>
+      `${new Date(r.time).toISOString()},${r.signal},${number(r.uptime) ? r.uptime : ''}`
+    )
+  ];
 
-        "fecha_iso,senal_dbm,tiempo_activo_segundos",
+  const blob = new Blob(
+    ['\ufeff' + rows.join('\n')],
+    { type: 'text/csv;charset=utf-8' }
+  );
 
-        ...history.map(item =>
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
 
-            new Date(item.time).toISOString() +
-            "," + item.signal +
-            "," + (number(item.uptime) ? item.uptime : "")
+  a.href = url;
 
-        )
+  a.download = demo
+    ? 'aquasolidaria-demo.csv'
+    : 'aquasolidaria-conexion.csv';
 
-    ];
+  a.click();
 
-    const blob = new Blob(
-        ["\ufeff" + rows.join("\n")],
-        { type: "text/csv;charset=utf-8" }
-    );
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-
-    a.href = url;
-
-    a.download = demo
-        ? "aquasolidaria-demo.csv"
-        : "aquasolidaria-historial.csv";
-
-    a.click();
-
-    setTimeout(
-        () => URL.revokeObjectURL(url),
-        1000
-    );
-
+  setTimeout(
+    () => URL.revokeObjectURL(url), 1000
+  );
 }
 
-// 17. ESCUCHAR FIREBASE
-
-function startListeners() {
-
-    const currentGeneration = generation;
-
-    function listen(path, callback) {
-
-        const unsubscribe = firebase.onValue(
-
-            firebase.ref(firebase.db, path),
-
-            snapshot => {
-
-                if (
-                    currentGeneration === generation
-                ) {
-
-                    callback(snapshot.val());
-
-                }
-
-            },
-
-            error => {
-
-                if (
-                    currentGeneration !== generation
-                ) return;
-
-                console.error(error);
-
-                if (path === "dispositivo") {
-                    device = null;
-                }
-
-                if (path === "sensores") {
-                    sensors = null;
-                }
-
-                if (path.startsWith("viviendas/")) {
-                    houseData = null;
-                }
-
-                errorBanner(
-                    "No se pudo consultar " + path +
-                    ". Revisa las reglas de Firebase."
-                );
-
-                render();
-
-            }
-
-        );
-
-        unsubscribers.push(unsubscribe);
-
-    }
-
-    // Estado de conexion del navegador
-
-    listen(".info/connected", value => {
-
-        connected = value === true;
-
-        render();
-
-    });
-
-    // Diferencia horaria con Firebase
-
-    listen(".info/serverTimeOffset", value => {
-
-        serverOffset = number(value) ? value : 0;
-
-        render();
-
-    });
-
-    // Cada vivienda solo puede leer su nodo.
-
-    if (role.house) {
-
-        listen(
-            "viviendas/" + role.house,
-
-            value => {
-
-                houseData = value;
-
-                render();
-
-            }
-        );
-
-    } else {
-
-        // Administrador y operador
-
-        listen("dispositivo", receiveDevice);
-
-        listen("sensores", value => {
-
-            sensors = value;
-
-            render();
-
-        });
-
-    }
-
-    // NO existen listeners de cambio de WiFi.
-    // NO se envian comandos al ESP32.
-
-}
-
-// 18. INICIO DE SESION
-
-async function login(event) {
-
-    event.preventDefault();
-
-    if (!firebase || signingIn) return;
-
-    signingIn = true;
-
-    $("loginButton").disabled = true;
-    $("demoButton").disabled = true;
-
-    loginMessage("Verificando credenciales...");
-
-    try {
-
-        await firebase.signInWithEmailAndPassword(
-
-            firebase.auth,
-
-            $("email").value.trim(),
-
-            $("password").value
-
-        );
-
-    } catch (error) {
-
-        const messages = {
-
-            "auth/invalid-credential":
-                "Correo o contraseña incorrectos.",
-
-            "auth/network-request-failed":
-                "No se pudo conectar con Firebase.",
-
-            "auth/too-many-requests":
-                "Demasiados intentos. Intenta más tarde.",
-
-            "auth/user-disabled":
-                "La cuenta está deshabilitada."
-
-        };
-
-        loginMessage(
-
-            messages[error.code] ||
-            "Error de autenticación: " + error.code,
-
-            true
-
-        );
-
-    } finally {
-
-        signingIn = false;
-
-        $("password").value = "";
-
-        $("loginButton").disabled = false;
-        $("demoButton").disabled = false;
-
-    }
-
-}
-
-// 19. INICIALIZAR FIREBASE
+// ==========================================
+// 08. FIREBASE Y AUTENTICACION
+// ==========================================
 
 async function initFirebase() {
+  try {
+    const [config, authSDK, dbSDK] =
+      await Promise.all([
+        import('./firebase-config.js'),
 
-    try {
+        import(
+          'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js'
+        ),
 
-        const [config, authSDK, dbSDK] =
-            await Promise.all([
+        import(
+          'https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js'
+        )
+      ]);
 
-                import("./firebase-config.js"),
+    firebase = {
+      ...config,
+      ...authSDK,
+      ...dbSDK
+    };
 
-                import(
-                    "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js"
-                ),
+    await firebase.setPersistence(
+      firebase.auth,
+      firebase.browserSessionPersistence
+    );
 
-                import(
-                    "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js"
-                )
+    firebase.onAuthStateChanged(
+      firebase.auth,
 
-            ]);
+      user => {
+        if (demo && !user) return;
 
-        firebase = {
+        stopSession();
 
-            ...config,
-            ...authSDK,
-            ...dbSDK
+        if (!user) {
+          loginMessage('Ingresa tus credenciales.');
+          return;
+        }
 
-        };
+        const selectedRole = roles[user.uid];
 
-        // La sesion se conserva durante
-        // la sesion del navegador.
+        if (!selectedRole) {
+          firebase.signOut(firebase.auth)
+            .catch(() => {});
 
-        await firebase.setPersistence(
-
-            firebase.auth,
-
-            firebase.browserSessionPersistence
-
-        );
-
-        firebase.onAuthStateChanged(
-
-            firebase.auth,
-
-            user => {
-
-                if (demo && !user) return;
-
-                stopSession();
-
-                if (!user) {
-
-                    loginMessage(
-                        "Ingresa tus credenciales."
-                    );
-
-                    return;
-
-                }
-
-                const selectedRole = roles[user.uid];
-
-                if (!selectedRole) {
-
-                    firebase.signOut(firebase.auth)
-                        .catch(console.error);
-
-                    loginMessage(
-                        "Esta cuenta no tiene acceso al portal.",
-                        true
-                    );
-
-                    return;
-
-                }
-
-                openShell(selectedRole);
-
-                startListeners();
-
-            }
-
-        );
-
-        $("loginButton").disabled = false;
-
-        loginMessage(
-            "Ingresa tus credenciales."
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        loginMessage(
-            "No se pudo iniciar Firebase. " +
-            "Comprueba tu conexión a internet.",
+          loginMessage(
+            'Esta cuenta no tiene acceso al portal.',
             true
-        );
+          );
 
-    }
+          return;
+        }
 
+        openShell(selectedRole);
+        startListeners();
+      }
+    );
+
+    $('loginButton').disabled = false;
+
+    loginMessage('Ingresa tus credenciales.');
+
+  } catch (error) {
+    console.error(
+      'No se pudo inicializar Firebase', error
+    );
+
+    loginMessage(
+      'No se pudo iniciar Firebase. Comprueba internet y abre la página con un servidor local.',
+      true
+    );
+  }
 }
 
-// 20. MODO DEMOSTRACION
+function startListeners() {
+  const token = generation;
+
+  const listen = (path, fn) => {
+    const unsubscribe = firebase.onValue(
+
+      firebase.ref(firebase.db, path),
+
+      snapshot => {
+        if (token === generation) {
+          fn(snapshot.val());
+        }
+      },
+
+      error => {
+        if (token !== generation) return;
+
+        errorBanner(
+          'No se pudo leer ' + path +
+          '. Revisa los permisos de Firebase.'
+        );
+
+        if (path === 'dispositivo') {
+          device = null;
+          renderDevice();
+        }
+
+        if (path.startsWith('viviendas/')) {
+          houseData = null;
+          renderHouse(null);
+        }
+
+        if (path === 'sensores') {
+          sensorData = null;
+          renderRealSensors();
+        }
+
+        console.error(error.code);
+      }
+    );
+
+    unsubscribers.push(unsubscribe);
+  };
+
+  listen('.info/connected', value => {
+    connected = value === true;
+
+    renderDevice();
+
+    if (role?.house && !connected) {
+      renderHouse(null);
+    }
+  });
+
+  listen('.info/serverTimeOffset', value => {
+    offset = number(value) ? value : 0;
+    renderDevice();
+  });
+
+  if (role.house) {
+    listen(
+      'viviendas/' + role.house,
+      value => {
+        houseData = value;
+        renderHouse(value);
+      }
+    );
+
+  } else {
+    listen('dispositivo', receiveDevice);
+
+    listen('sensores', value => {
+      sensorData = value;
+      renderRealSensors();
+    });
+  }
+
+  // No se consultan ni se envian comandos
+  // de cambio remoto de red WiFi.
+}
+
+async function login(event) {
+  event.preventDefault();
+
+  if (!firebase) return;
+
+  $('loginButton').disabled = true;
+
+  loginMessage('Verificando credenciales…');
+
+  try {
+    await firebase.signInWithEmailAndPassword(
+      firebase.auth,
+      $('email').value.trim(),
+      $('password').value
+    );
+
+  } catch (error) {
+    const messages = {
+      'auth/network-request-failed':
+        'No se pudo conectar a Firebase.',
+
+      'auth/too-many-requests':
+        'Demasiados intentos. Intenta más tarde.',
+
+      'auth/user-disabled':
+        'La cuenta está deshabilitada.',
+
+      'auth/invalid-credential':
+        'Correo o contraseña incorrectos.'
+    };
+
+    loginMessage(
+      messages[error.code] ||
+      'No se pudo iniciar sesión. Código: ' +
+      (error.code || 'desconocido'),
+      true
+    );
+
+  } finally {
+    $('password').value = '';
+    $('loginButton').disabled = false;
+  }
+}
+
+// ==========================================
+// 09. ANIMACION DE LOS TINACOS
+// ==========================================
+
+function tank(waterId, levelId, value) {
+  const valid =
+    number(value) &&
+    value >= 0 &&
+    value <= 100;
+
+  $(waterId).classList.toggle(
+    'measured', valid && value > 0
+  );
+
+  $(waterId).style.height =
+    valid ? `${value}%` : '0%';
+
+  text(
+    levelId,
+    valid ? `${value}%` : '—'
+  );
+}
+
+// ==========================================
+// 10. MODO DEMOSTRACION
+// ==========================================
+
+let demoLevel = 73;
+let demoPumps = [true, true];
+
+function renderDemoTanks(active) {
+  const level = active ? demoLevel : null;
+
+  tank('mainWater', 'mainLevel', level);
+  tank('water1', 'level1', active ? 52 : null);
+  tank('water2', 'level2', active ? 48 : null);
+
+  text(
+    'mainLevelNote',
+    active ? 'Nivel simulado' : 'Sin medición'
+  );
+
+  text(
+    'note1',
+    active ? 'Nivel simulado' : 'Sin lectura'
+  );
+
+  text(
+    'note2',
+    active ? 'Nivel simulado' : 'Sin lectura'
+  );
+
+  text(
+    'availableWater',
+    active
+      ? `${(demoLevel * 40).toLocaleString('es-MX')} L`
+      : '—'
+  );
+
+  text(
+    'waterMetricNote',
+    active
+      ? 'Volumen ilustrativo'
+      : 'Pendiente de medición'
+  );
+
+  text(
+    'networkMode',
+    active ? 'Simulación' : 'Sin sensores'
+  );
+
+  show('demoControls', active);
+
+  $('demoLevel').value = demoLevel;
+
+  text('demoLevelValue', `${demoLevel}%`);
+
+  for (let i = 0; i < 2; i++) {
+    const n = i + 1;
+
+    const running =
+      active &&
+      demoLevel > 0 &&
+      demoPumps[i];
+
+    $('flow' + n).classList.toggle(
+      'active', running
+    );
+
+    $('pumpMark' + n).classList.toggle(
+      'running', running
+    );
+
+    $('demoPump' + n).setAttribute(
+      'aria-pressed',
+      String(demoPumps[i])
+    );
+
+    text(
+      'demoPump' + n,
+      `Ramal ${n} · ${demoPumps[i] ? 'ON' : 'OFF'}`
+    );
+
+    text(
+      'pump' + n + 'State',
+      !active
+        ? 'Sin configurar'
+        : running
+          ? 'Flujo simulado'
+          : demoPumps[i]
+            ? 'Sin agua (simulado)'
+            : 'Inactivo (simulado)'
+    );
+  }
+
+  for (const id of [
+    'sensorUltra',
+    'sensorFloat1',
+    'sensorFloat2',
+    'sensorFlow'
+  ]) {
+    text(
+      id,
+      active ? 'Simulación' : 'Pendiente'
+    );
+  }
+}
 
 function startDemo() {
+  stopSession();
 
-    if (signingIn || firebase?.auth?.currentUser) {
-        return;
-    }
+  demo = true;
+  connected = true;
+  demoLevel = 73;
+  demoPumps = [true, true];
 
-    stopSession();
+  openShell({
+    name: 'Demostración',
+    pages: [
+      'overview', 'monitor', 'distribution',
+      'history', 'alerts', 'settings'
+    ]
+  });
 
-    demo = true;
+  renderDemoTanks(true);
 
-    connected = true;
+  let seconds = 0;
 
-    openShell({
+  const sample = () => {
+    seconds += 5;
 
-        name: "Demostración",
-
-        pages: [
-            "overview",
-            "monitor",
-            "distribution",
-            "history",
-            "alerts",
-            "settings"
-        ]
-
+    receiveDevice({
+      nombre: 'ESP32 de ejemplo',
+      wifi: 'Red simulada',
+      ip: '—',
+      senal:
+        -60 + Math.round(Math.sin(seconds / 12) * 6),
+      tiempoActivo: seconds,
+      ultimaActualizacion: Date.now()
     });
+  };
 
-    let seconds = 0;
+  sample();
 
-    function sample() {
-
-        seconds += 2;
-
-        const now = Date.now();
-
-        // Estos datos son completamente ficticios.
-        // No se escriben en Firebase.
-
-        sensors = {
-
-            ultimaActualizacion: now,
-
-            principal: {
-
-                distanciaCm: 33,
-                nivel: 73,
-                capacidadLitros: 1,
-                volumen: 0.73
-
-            },
-
-            casa1: {
-
-                distanciaCm: 35,
-                nivel: 52,
-                capacidadLitros: 0.2,
-                volumen: 0.104,
-                lleno: false,
-                flotador: false,
-                pulsos: 100,
-                frecuenciaHz: 3,
-                litros: 0.104,
-                caudal: 0.3
-
-            },
-
-            casa2: {
-
-                distanciaCm: 36,
-                nivel: 48,
-                capacidadLitros: 0.2,
-                volumen: 0.096,
-                lleno: false,
-                flotador: false,
-                pulsos: 92,
-                frecuenciaHz: 3,
-                litros: 0.096,
-                caudal: 0.28
-
-            }
-
-        };
-
-        receiveDevice({
-
-            wifi: "Red de demostración",
-
-            ip: "—",
-
-            senal:
-                -48 + Math.round(Math.sin(seconds) * 4),
-
-            tiempoActivo: seconds,
-
-            ultimaActualizacion: now
-
-        });
-
-    }
-
-    sample();
-
-    demoTimer = setInterval(sample, 2000);
-
+  demoTimer = setInterval(sample, 5000);
 }
 
-// 21. MODO OSCURO
+// ==========================================
+// 11. INTERPRETACION DE MEDICIONES REALES
+// ==========================================
+
+function cm(v) {
+  return number(v)
+    ? v.toFixed(1) + ' cm'
+    : 'Sin lectura válida';
+}
+
+function estadoDistancia(x) {
+  if (
+    number(x.distanciaCm) &&
+    x.distanciaCm >= 0
+  ) {
+    return cm(x.distanciaCm);
+  }
+
+  if (x.estadoUltrasonico === 'zona_ciega') {
+    return 'Zona ciega (eco no fiable)';
+  }
+
+  if (x.estadoUltrasonico === 'sin_eco') {
+    return 'Sin respuesta ECHO';
+  }
+
+  if (x.estadoUltrasonico === 'fuera_rango') {
+    return 'Eco fuera de rango';
+  }
+
+  return 'Sin lectura válida';
+}
+
+function estadoFlotador(x) {
+  if (x.lleno === true) {
+    return 'LLENO según flotador';
+  }
+
+  if (x.lleno === false) {
+    return 'Debajo del umbral';
+  }
+
+  if (typeof x.flotador === 'boolean') {
+    return (
+      x.flotador
+        ? 'Contacto cerrado'
+        : 'Contacto abierto'
+    ) + ' · sin calibrar';
+  }
+
+  return 'Sin lectura';
+}
+
+function notaTanque(x, vivienda = false) {
+  return estadoDistancia(x) +
+
+    (
+      vivienda
+        ? ' · ' + estadoFlotador(x)
+        : ''
+    ) +
+
+    (
+      number(x.capacidadLitros)
+        ? ' · Capacidad: ' +
+          (
+            x.capacidadLitros < 1
+              ? Math.round(x.capacidadLitros * 1000) +
+                ' ml'
+              : x.capacidadLitros + ' L'
+          )
+        : ''
+    );
+}
+
+function renderRealSensors() {
+  if (demo || !role || role.house) return;
+
+  const d = sensorData;
+
+  const fresh =
+    connected &&
+    number(d?.ultimaActualizacion) &&
+    Math.abs(
+      Date.now() + offset - d.ultimaActualizacion
+    ) <= 20000;
+
+  const p = fresh ? d.principal || {} : {};
+  const a = fresh ? d.casa1 || {} : {};
+  const b = fresh ? d.casa2 || {} : {};
+
+  tank('mainWater', 'mainLevel', p.nivel);
+  tank('water1', 'level1', a.nivel);
+  tank('water2', 'level2', b.nivel);
+
+  // El flotador detecta el umbral de llenado
+  // sin inventar un porcentaje exacto.
+
+  for (const [i, x] of [[1, a], [2, b]]) {
+    if (!number(x.nivel) && x.lleno === true) {
+      text('level' + i, 'Lleno');
+    }
+  }
+
+  text('mainLevelNote', notaTanque(p));
+  text('note1', notaTanque(a, true));
+  text('note2', notaTanque(b, true));
+
+  text(
+    'availableWater',
+    number(p.volumen)
+      ? p.volumen.toFixed(2) + ' L'
+      : '—'
+  );
+
+  text(
+    'waterMetricNote',
+    'Volumen sujeto a calibración'
+  );
+
+  text(
+    'networkMode',
+    fresh ? 'Monitoreo manual' : 'Sin lectura reciente'
+  );
+
+  text(
+    'sensorUltra',
+    [p, a, b].map(estadoDistancia).join(' / ')
+  );
+
+  text('sensorFloat1', estadoFlotador(a));
+  text('sensorFloat2', estadoFlotador(b));
+
+  // Alertas de llenado.
+
+  if (fresh && (a.lleno === true || b.lleno === true)) {
+    text(
+      'alertText',
+
+      'Umbral de llenado alcanzado: ' +
+
+      [
+        a.lleno === true ? 'Vivienda 1' : '',
+        b.lleno === true ? 'Vivienda 2' : ''
+      ].filter(Boolean).join(' y ') +
+
+      '. Apaga manualmente la bomba.'
+    );
+  }
+
+  const flow = x =>
+    number(x.caudal)
+      ? x.caudal.toFixed(2) + ' L/min'
+      : number(x.pulsos)
+        ? x.pulsos + ' pulsos (sin calibrar)'
+        : '—';
+
+  text(
+    'sensorFlow',
+    'V1: ' + flow(a) + ' · V2: ' + flow(b)
+  );
+
+  // Animar ramales solamente si se detecta flujo.
+
+  for (const [i, x] of [[1, a], [2, b]]) {
+    text(
+      'pump' + i + 'State',
+      number(x.frecuenciaHz)
+        ? x.frecuenciaHz > 0
+          ? 'Flujo detectado'
+          : 'Sin pulsos'
+        : 'Sin lectura'
+    );
+
+    $('flow' + i).classList.toggle(
+      'active',
+      number(x.frecuenciaHz) &&
+      x.frecuenciaHz > 0
+    );
+
+    $('pumpMark' + i).classList.remove('running');
+  }
+
+  // Calcular el reparto con litros reales.
+
+  text(
+    'realDistribution',
+
+    number(a.litros) &&
+    number(b.litros) &&
+    a.litros + b.litros > 0
+
+      ? 'V1: ' +
+        (
+          100 * a.litros / (a.litros + b.litros)
+        ).toFixed(1) +
+
+        '% · V2: ' +
+
+        (
+          100 * b.litros / (a.litros + b.litros)
+        ).toFixed(1) +
+
+        '% (desde arranque)'
+
+      : 'Distribución pendiente de calibración o flujo'
+  );
+}
+
+// ==========================================
+// 12. MODO CLARO Y OSCURO
+// ==========================================
 
 function toggleTheme() {
+  const next =
+    document.documentElement.dataset.theme === 'dark'
+      ? 'light'
+      : 'dark';
 
-    const current =
-        document.documentElement.dataset.theme;
+  document.documentElement.dataset.theme = next;
 
-    const next = current === "dark"
-        ? "light"
-        : "dark";
-
-    document.documentElement.dataset.theme = next;
-
-    try {
-
-        localStorage.setItem(
-            "aquasolidaria-theme", next
-        );
-
-    } catch {}
-
+  try {
+    localStorage.setItem('aqua-theme', next);
+  } catch {}
 }
 
 try {
+  const saved = localStorage.getItem('aqua-theme');
 
-    const saved = localStorage.getItem(
-        "aquasolidaria-theme"
-    );
-
-    if (["dark", "light"].includes(saved)) {
-
-        document.documentElement.dataset.theme =
-            saved;
-
-    }
-
+  if (['light', 'dark'].includes(saved)) {
+    document.documentElement.dataset.theme = saved;
+  }
 } catch {}
 
-// 22. EVENTOS DE LA PAGINA
+// ==========================================
+// 13. EVENTOS DE LA INTERFAZ
+// ==========================================
 
-document.querySelectorAll(".theme-toggle")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click", toggleTheme
-        );
-
-    });
-
-$("loginForm").addEventListener(
-    "submit", login
+$('themeButton').addEventListener(
+  'click', toggleTheme
 );
 
-$("demoButton").addEventListener(
-    "click", startDemo
+$('themePublic').addEventListener(
+  'click', toggleTheme
 );
 
-$("exportHistory").addEventListener(
-    "click", exportHistory
+$('loginForm').addEventListener(
+  'submit', login
 );
 
-$("showPassword").addEventListener(
+$('demoButton').addEventListener(
+  'click', startDemo
+);
 
-    "click",
+$('showPassword').addEventListener(
+  'click',
+
+  () => {
+    const visible = $('password').type === 'password';
+
+    $('password').type =
+      visible ? 'text' : 'password';
+
+    text(
+      'showPassword',
+      visible ? 'Ocultar' : 'Ver'
+    );
+
+    $('showPassword').setAttribute(
+      'aria-pressed', String(visible)
+    );
+  }
+);
+
+$('logout').addEventListener(
+  'click',
+
+  async () => {
+    if (demo) {
+      stopSession();
+      return;
+    }
+
+    try {
+      await firebase.signOut(firebase.auth);
+    } catch {
+      errorBanner(
+        'No se pudo cerrar sesión. Intenta nuevamente.'
+      );
+    }
+  }
+);
+
+$('menuToggle').addEventListener(
+  'click',
+
+  () => {
+    const open =
+      $('topNavigation').classList.toggle('open');
+
+    show('overlay', open);
+
+    $('menuToggle').setAttribute(
+      'aria-expanded', String(open)
+    );
+  }
+);
+
+window.matchMedia('(min-width: 901px)')
+  .addEventListener('change', e => {
+    if (e.matches) {
+      closeMenu();
+    }
+  });
+
+$('overlay').addEventListener(
+  'click', closeMenu
+);
+
+document.addEventListener(
+  'keydown',
+
+  e => {
+    if (e.key === 'Escape') {
+      closeMenu();
+    }
+  }
+);
+
+$('export').addEventListener(
+  'click', exportHistory
+);
+
+// Controles de la demostracion.
+
+$('demoLevel').addEventListener(
+  'input',
+
+  e => {
+    if (demo) {
+      demoLevel = Number(e.target.value);
+      renderDemoTanks(true);
+    }
+  }
+);
+
+for (let i = 0; i < 2; i++) {
+  $('demoPump' + (i + 1)).addEventListener(
+    'click',
 
     () => {
-
-        const visible =
-            $("password").type === "password";
-
-        $("password").type =
-            visible ? "text" : "password";
-
-        text(
-            "showPassword",
-            visible ? "Ocultar" : "Ver"
-        );
-
+      if (demo) {
+        demoPumps[i] = !demoPumps[i];
+        renderDemoTanks(true);
+      }
     }
+  );
+}
 
+$('demoReset').addEventListener(
+  'click',
+
+  () => {
+    if (demo) {
+      demoLevel = 73;
+      demoPumps = [true, true];
+
+      renderDemoTanks(true);
+    }
+  }
 );
 
-$("logout").addEventListener(
+// Actualizar la interfaz y verificar la
+// antiguedad de las mediciones cada segundo.
 
-    "click",
+setInterval(() => {
+  if (role) {
+    renderDevice();
 
-    async () => {
-
-        if (demo) {
-
-            stopSession();
-
-            return;
-
-        }
-
-        if (firebase) {
-
-            try {
-
-                await firebase.signOut(firebase.auth);
-
-            } catch {
-
-                errorBanner(
-                    "No se pudo cerrar sesión."
-                );
-
-            }
-
-        }
-
+    if (role.house) {
+      renderHouse(houseData);
+    } else if (!demo) {
+      renderRealSensors();
     }
+  }
+}, 1000);
 
-);
-
-// Verificar constantemente que los datos
-// recibidos no se encuentren desactualizados.
-
-setInterval(render, 1000);
-
-// Iniciar la aplicacion
+// Iniciar AquaSolidaria.
 
 initFirebase();
