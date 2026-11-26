@@ -1,444 +1,618 @@
 
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es-MX" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <meta name="theme-color" content="#087f9b">
-    <title>AquaSolidaria | Gestión inteligente del agua</title>
-
-    <link rel="stylesheet" href="./styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#083b50">
+  <title>AquaSolidaria · Gestión inteligente del agua</title>
+  <link rel="stylesheet" href="styles.css?v=6-diseno-original">
+  <script type="module" src="app.js?v=6-diseno-original"></script>
 </head>
 <body>
 
-<!-- PANTALLA DE INICIO -->
-
-<section id="welcome" class="welcome">
-
+  <!-- PORTADA -->
+  <div id="welcome" class="welcome">
     <header class="public-header">
-        <a class="brand" href="./">
-            <span class="logo">💧</span>
-            <span>Aqua<span class="accent">Solidaria</span>
-                <small>GESTIÓN INTELIGENTE DEL AGUA</small>
-            </span>
-        </a>
-
-        <button class="secondary theme-toggle">
-            ☀ / ☾
-        </button>
+      <a class="brand" href="#">
+        <span class="logo">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M16 3C13 9 6 14 6 21a10 10 0 0 0 20 0C26 14 19 9 16 3Z" fill="none" stroke="currentColor" stroke-width="2.2"/>
+            <path d="M10 22c2 4 5 5 9 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>Aqua<span class="accent">Solidaria</span>
+          <small>GESTIÓN INTELIGENTE DEL AGUA</small>
+        </span>
+      </a>
+      <button class="ghost" id="themePublic" aria-label="Cambiar tema">
+        <span data-icon="theme"></span> Tema
+      </button>
     </header>
 
-    <main class="welcome-grid">
+    <main class="hero">
+      <div class="intro">
+        <span class="eyebrow"><i></i> TECNOLOGÍA QUE CUIDA EL AGUA</span>
+        <h1>El agua nos<br><em>conecta.</em></h1>
+        <p>Una manera inteligente de aprovechar el agua de lluvia, supervisar su almacenamiento y distribuirla responsablemente entre dos viviendas.</p>
 
-        <section class="hero">
-            <span class="eyebrow">TECNOLOGÍA PARA COMPARTIR</span>
+        <div class="hero-features">
+          <span><span data-icon="radar"></span> Monitoreo en vivo</span>
+          <span><span data-icon="flow"></span> Distribución responsable</span>
+          <span><span data-icon="chip"></span> Tecnología ESP32</span>
+        </div>
 
-            <h1>Cada gota<br>hace la diferencia.</h1>
+        <!-- Ilustracion original -->
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 640 310" class="hero-scene">
+            <defs>
+              <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+                <stop stop-color="#23d7e5"/>
+                <stop offset="1" stop-color="#075588"/>
+              </linearGradient>
+              <linearGradient id="glass" x1="0" x2="1">
+                <stop stop-color="#8ef4f4" stop-opacity=".26"/>
+                <stop offset=".5" stop-color="#d9ffff" stop-opacity=".07"/>
+                <stop offset="1" stop-color="#71e3fa" stop-opacity=".4"/>
+              </linearGradient>
+              <radialGradient id="halo">
+                <stop stop-color="#4de6df" stop-opacity=".25"/>
+                <stop offset="1" stop-color="#4de6df" stop-opacity="0"/>
+              </radialGradient>
+              <pattern id="gridScene" width="28" height="28" patternUnits="userSpaceOnUse">
+                <path d="M28 0H0V28" stroke="#b7ffff" stroke-opacity=".08" fill="none"/>
+              </pattern>
+              <clipPath id="sceneClip">
+                <rect width="640" height="310" rx="20"/>
+              </clipPath>
+              <clipPath id="heroTankClip">
+                <rect x="261" y="61" width="118" height="151" rx="24"/>
+              </clipPath>
+            </defs>
 
-            <p>
-                Sistema inteligente de monitoreo y distribución
-                solidaria del agua mediante tecnología IoT.
-            </p>
+            <g clip-path="url(#sceneClip)">
+              <rect width="640" height="310" fill="url(#gridScene)"/>
+              <circle cx="320" cy="143" r="210" fill="url(#halo)"/>
 
-            <div class="hero-water">
-                <div class="bubble bubble-one"></div>
-                <div class="bubble bubble-two"></div>
-                <div class="bubble bubble-three"></div>
-                <div class="hero-drop">💧</div>
-                <div class="hero-wave"></div>
-            </div>
+              <g class="rain" stroke="#95ffff" stroke-width="2" stroke-linecap="round" opacity=".65">
+                <path d="M85 13l-8 15M146 7l-8 15M205 27l-8 15M430 11l-8 15M489 30l-8 15M557 7l-8 15"/>
+                <path d="M108 55l-8 15M225 66l-8 15M410 54l-8 15M531 63l-8 15"/>
+              </g>
 
-            <div class="features">
-                <div><strong>3</strong><small>Tinacos</small></div>
-                <div><strong>7</strong><small>Sensores</small></div>
-                <div><strong>2</strong><small>Viviendas</small></div>
-            </div>
-        </section>
+              <g fill="none" stroke="#72cdd8" stroke-width="10" stroke-linejoin="round">
+                <path d="M320 211v28H132v-24M320 239h188v-24"/>
+              </g>
 
-        <section class="login panel">
+              <g fill="none" stroke="#b5fff7" stroke-width="3" stroke-dasharray="4 13" class="scene-flow">
+                <path d="M320 211v28H132v-24M320 239h188v-24"/>
+              </g>
 
-            <span class="eyebrow">PORTAL DE ACCESO</span>
+              <g fill="url(#glass)" stroke="#9ae4ec" stroke-width="2">
+                <path d="M62 146l70-57 70 57v70H62Z M438 146l70-57 70 57v70H438Z"/>
+                <rect x="261" y="61" width="118" height="151" rx="24"/>
+              </g>
 
-            <h2>Bienvenido</h2>
+              <g fill="#b2f9f5" opacity=".75">
+                <rect x="82" y="158" width="27" height="27" rx="5"/>
+                <rect x="155" y="158" width="27" height="27" rx="5"/>
+                <rect x="458" y="158" width="27" height="27" rx="5"/>
+                <rect x="531" y="158" width="27" height="27" rx="5"/>
+              </g>
 
-            <p class="muted">
-                Ingresa a tu cuenta de AquaSolidaria.
-            </p>
+              <g clip-path="url(#heroTankClip)">
+                <path class="tank-scene-wave" d="M211 126q30-15 60 0t60 0t60 0t60 0v100H211Z" fill="url(#sea)"/>
+                <path d="M278 79v101" stroke="#e0ffff" stroke-opacity=".6" stroke-width="4" stroke-linecap="round"/>
+              </g>
 
-            <form id="loginForm">
+              <ellipse cx="320" cy="61" rx="58" ry="13" fill="#1a7589" stroke="#a5e8ee" stroke-width="2"/>
+              <rect x="297" y="42" width="46" height="12" rx="5" fill="#b0f0ec"/>
 
-                <label for="email">Correo electrónico</label>
+              <g fill="#dcffff" font-family="system-ui" font-size="10" font-weight="700" text-anchor="middle" letter-spacing="1.5">
+                <text x="132" y="136">VIVIENDA 01</text>
+                <text x="508" y="136">VIVIENDA 02</text>
+                <text x="320" y="105">RESERVA</text>
+              </g>
 
-                <input id="email"
-                       type="email"
-                       autocomplete="username"
-                       placeholder="usuario@aquasolidaria.mx"
-                       required>
+              <path class="sea-back" d="M-320 264Q-240 225-160 264T0 264T160 264T320 264T480 264T640 264T800 264T960 264V340H-320Z" fill="#5ee7e5" opacity=".36"/>
 
-                <label for="password">Contraseña</label>
+              <path class="sea-front" d="M-320 281Q-240 252-160 281T0 281T160 281T320 281T480 281T640 281T800 281T960 281V350H-320Z" fill="url(#sea)"/>
+            </g>
+          </svg>
+          <span class="art-caption">ILUSTRACIÓN DEL PROYECTO · NO REPRESENTA MEDICIONES</span>
+        </div>
+      </div>
 
-                <div class="password-wrap">
-                    <input id="password"
-                           type="password"
-                           autocomplete="current-password"
-                           required>
+      <!-- INICIO DE SESION -->
+      <section class="login panel" aria-labelledby="loginTitle">
+        <span class="eyebrow">PORTAL DE ACCESO</span>
+        <h2 id="loginTitle">Bienvenido a tu centro de agua.</h2>
+        <p class="muted">Accede a tu espacio de monitoreo con tu cuenta de AquaSolidaria.</p>
 
-                    <button type="button"
-                            id="showPassword"
-                            class="secondary">Ver</button>
-                </div>
+        <form id="loginForm">
+          <label for="email">Correo electrónico</label>
+          <input id="email" type="email" autocomplete="username" placeholder="usuario@aquasolidaria.mx" required>
 
-                <button id="loginButton"
-                        type="submit"
-                        class="primary full"
-                        disabled>
-                    Iniciar sesión →
-                </button>
+          <label for="password">Contraseña</label>
+          <div class="password-wrap">
+            <input id="password" type="password" autocomplete="current-password" required>
+            <button type="button" id="showPassword" class="ghost" aria-label="Mostrar contraseña" aria-pressed="false">Ver</button>
+          </div>
 
-                <p id="loginMessage" role="status">
-                    Conectando con Firebase...
-                </p>
-            </form>
+          <button id="loginButton" class="primary" type="submit" disabled>
+            Iniciar sesión <span data-icon="arrow"></span>
+          </button>
 
-            <button id="demoButton"
-                    class="secondary full">
-                Explorar demostración
-            </button>
+          <p id="loginMessage" role="status" class="message">Cargando conexión con Firebase…</p>
+        </form>
 
-            <p class="muted small">
-                La demostración utiliza datos ficticios
-                y no controla dispositivos reales.
-            </p>
-
-        </section>
-
+        <div class="separator"></div>
+        <button id="demoButton" class="outline" type="button">
+          <span data-icon="waves"></span> Explorar demostración visual
+        </button>
+        <small class="muted">La demostración no accede a Firebase ni controla equipos.</small>
+      </section>
     </main>
 
-</section>
+    <footer class="public-footer">
+      AquaSolidaria · Cuidado del agua de lluvia · Proyecto académico 2026
+    </footer>
+  </div>
 
-<!-- PANEL PRINCIPAL -->
+  <!-- APLICACION PRINCIPAL -->
+  <div id="shell" class="shell" hidden>
+    <header class="app-header">
+      <div class="topbar">
+        <a class="brand" href="#">
+          <span class="logo">
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+              <path d="M16 3C13 9 6 14 6 21a10 10 0 0 0 20 0C26 14 19 9 16 3Z" fill="none" stroke="currentColor" stroke-width="2.2"/>
+              <path d="M9 21c3-3 5 3 8 0s5-3 7-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>Aqua<span class="accent">Solidaria</span>
+            <small>GESTIÓN INTELIGENTE DEL AGUA</small>
+          </span>
+        </a>
 
-<div id="shell" hidden>
-
-    <header class="topbar">
-
-        <div class="brand">
-            <span class="logo">💧</span>
-            <span>Aqua<span class="accent">Solidaria</span></span>
+        <div class="top-actions">
+          <span id="connection" class="pill neutral" role="status">Sin lectura</span>
+          <div class="identity">
+            <span data-icon="user"></span>
+            <strong id="roleLabel">Usuario</strong>
+          </div>
+          <button id="themeButton" class="ghost icon-button" aria-label="Cambiar tema">
+            <span data-icon="theme"></span>
+          </button>
+          <button id="logout" class="outline exit-button" aria-label="Cerrar sesión">
+            <span data-icon="logout"></span>
+            <span class="exit-label">Salir</span>
+          </button>
+          <button id="menuToggle" class="ghost mobile icon-button" aria-label="Abrir menú" aria-controls="topNavigation" aria-expanded="false">
+            <span data-icon="menu"></span>
+          </button>
         </div>
-
-        <div class="header-actions">
-            <span id="connection" class="status">
-                Sin lectura
-            </span>
-
-            <span id="roleLabel" class="role-label"></span>
-
-            <button class="secondary theme-toggle">
-                ☀ / ☾
-            </button>
-
-            <button id="logout" class="secondary">
-                Salir
-            </button>
-        </div>
-
+      </div>
+      <div id="topNavigation" class="top-navigation">
+        <nav id="navigation" aria-label="Menú principal"></nav>
+        <span class="nav-edition"><span data-icon="waves"></span> Edición Marea · 4.0</span>
+      </div>
     </header>
 
-    <nav id="navigation" class="navigation"></nav>
+    <div id="overlay" class="overlay" hidden></div>
 
-    <main class="dashboard">
+    <main class="workspace">
+      <div class="content">
 
-        <div id="demoBanner" class="notice" hidden>
-            Modo demostración: todos los datos son ficticios.
+        <div class="breadcrumb">
+          <span data-icon="drop"></span> AquaSolidaria
+          <span class="crumb-slash">/</span>
+          <span id="crumb">General</span>
         </div>
 
-        <div id="errorBanner"
-             class="notice danger"
-             role="alert"
-             hidden>
+        <div id="demoBanner" class="notice demo" hidden>
+          Modo demostración · Todos los valores de esta sesión son ficticios. No se envían órdenes al ESP32.
         </div>
+        <div id="errorBanner" class="notice error" role="status" hidden></div>
 
-        <!-- INICIO -->
-
-        <section id="overview" class="page" hidden>
-
-            <div class="page-heading">
-                <span class="eyebrow">CENTRO DE MONITOREO</span>
-                <h1>Estado general</h1>
-                <p class="muted">
-                    Consulta el estado de AquaSolidaria.
-                </p>
+        <!-- RESUMEN GENERAL -->
+        <section class="page" id="overview">
+          <div class="heading">
+            <div>
+              <span class="eyebrow">CENTRO DE MONITOREO</span>
+              <h1>Tu sistema de agua<span class="accent">.</span></h1>
+              <p class="muted">Supervisa el estado de tu sistema de agua en un solo lugar.</p>
             </div>
+            <span id="dateLabel" class="date-chip"></span>
+          </div>
 
-            <div class="metrics">
-
-                <article class="panel metric">
-                    <span class="metric-icon">📡</span>
-                    <small>ESP32</small>
-                    <strong id="deviceState">—</strong>
-                </article>
-
-                <article class="panel metric">
-                    <span class="metric-icon">📶</span>
-                    <small>Señal WiFi</small>
-                    <strong id="rssi">—</strong>
-                </article>
-
-                <article class="panel metric">
-                    <span class="metric-icon">⏱</span>
-                    <small>Tiempo activo</small>
-                    <strong id="uptime">—</strong>
-                </article>
-
-                <article class="panel metric">
-                    <span class="metric-icon">💧</span>
-                    <small>Agua disponible</small>
-                    <strong id="availableWater">—</strong>
-                </article>
-
+          <div class="system-strip">
+            <span class="status-orb" aria-hidden="true"></span>
+            <div>
+              <b id="systemHeadline">Esperando telemetría</b>
+              <small id="systemDetail">Las mediciones llegarán desde Firebase.</small>
             </div>
+            <span class="strip-tag">ESP32 / IoT</span>
+          </div>
 
-            <article class="panel">
+          <div class="metrics">
+            <article class="panel metric">
+              <span class="metric-icon" data-icon="chip"></span>
+              <small>Estado del ESP32</small>
+              <strong id="deviceState">—</strong>
+              <span id="lastUpdate" class="muted">Sin datos</span>
+            </article>
 
-                <h2>Sistema de distribución</h2>
+            <article class="panel metric">
+              <span class="metric-icon" data-icon="wifi"></span>
+              <small>Señal WiFi</small>
+              <strong id="rssi">—</strong>
+              <span class="muted">Intensidad recibida</span>
+            </article>
 
-                <p class="muted">
-                    Un tinaco principal abastece dos viviendas.
-                </p>
+            <article class="panel metric">
+              <span class="metric-icon" data-icon="clock"></span>
+              <small>Tiempo activo</small>
+              <strong id="uptime">—</strong>
+              <span class="muted">Desde el último reinicio</span>
+            </article>
 
-                <div class="water-network">
+            <article class="panel metric">
+              <span class="metric-icon" data-icon="drop"></span>
+              <small>Agua disponible</small>
+              <strong id="availableWater">—</strong>
+              <span class="muted" id="waterMetricNote">Pendiente de medición</span>
+            </article>
+          </div>
 
-                    <div id="mainTank"></div>
+          <div class="dashboard-grid">
+            <article class="panel network">
+              <div class="card-title">
+                <div>
+                  <h2 class="icon-heading"><span data-icon="flow"></span> Red de distribución</h2>
+                  <p>Esquema del prototipo · objetivo 50/50</p>
+                </div>
+                <span class="pill neutral" id="networkMode">Sin sensores</span>
+              </div>
 
-                    <div class="pipe"></div>
+              <div class="network-art">
+                <div class="network-grid-bg" aria-hidden="true"></div>
 
-                    <div class="branch-pipes"></div>
-
-                    <div class="house-tanks">
-                        <div id="homeTank1"></div>
-                        <div id="homeTank2"></div>
+                <div class="tank-unit main-tank">
+                  <div class="tank">
+                    <div class="water" id="mainWater" aria-hidden="true">
+                      <div class="water-wave wave-a"></div>
+                      <div class="water-wave wave-b"></div>
+                      <i class="bubble b1"></i>
+                      <i class="bubble b2"></i>
+                      <i class="bubble b3"></i>
+                      <i class="bubble b4"></i>
                     </div>
-
+                    <strong id="mainLevel">—</strong>
+                  </div>
+                  <b>Tinaco principal</b>
+                  <small id="mainLevelNote">Sin medición</small>
                 </div>
 
-                <div class="notice">
-                    La bomba funciona de manera manual.
-                    No se puede encender ni apagar desde la web.
+                <div class="pipes">
+                  <svg viewBox="0 0 400 90" preserveAspectRatio="none">
+                    <path d="M200 0 V36 H100 V90 M200 36 H300 V90" class="pipe-base"/>
+                    <path id="flow1" d="M200 0 V36 H100 V90" class="pipe-flow"/>
+                    <path id="flow2" d="M200 0 V36 H300 V90" class="pipe-flow"/>
+                  </svg>
+                  <span class="pump-mark one" id="pumpMark1">
+                    <span class="impeller" data-icon="flow"></span>
+                    <small>R1</small>
+                  </span>
+                  <span class="pump-mark two" id="pumpMark2">
+                    <span class="impeller" data-icon="flow"></span>
+                    <small>R2</small>
+                  </span>
                 </div>
 
+                <div class="houses">
+
+                  <div class="tank-unit">
+                    <span class="house-roof" aria-hidden="true">
+                      <svg viewBox="0 0 48 30">
+                        <path d="M3 23L24 5l21 18M10 20v7h28v-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                      </svg>
+                    </span>
+                    <div class="tank small-tank">
+                      <div class="water" id="water1" aria-hidden="true">
+                        <div class="water-wave wave-a"></div>
+                        <div class="water-wave wave-b"></div>
+                        <i class="bubble b1"></i>
+                        <i class="bubble b2"></i>
+                        <i class="bubble b3"></i>
+                        <i class="bubble b4"></i>
+                      </div>
+                      <strong id="level1">—</strong>
+                    </div>
+                    <b>Vivienda 1</b>
+                    <small id="note1">Sin lectura</small>
+                  </div>
+
+                  <div class="tank-unit">
+                    <span class="house-roof" aria-hidden="true">
+                      <svg viewBox="0 0 48 30">
+                        <path d="M3 23L24 5l21 18M10 20v7h28v-7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                      </svg>
+                    </span>
+                    <div class="tank small-tank">
+                      <div class="water" id="water2" aria-hidden="true">
+                        <div class="water-wave wave-a"></div>
+                        <div class="water-wave wave-b"></div>
+                        <i class="bubble b1"></i>
+                        <i class="bubble b2"></i>
+                        <i class="bubble b3"></i>
+                        <i class="bubble b4"></i>
+                      </div>
+                      <strong id="level2">—</strong>
+                    </div>
+                    <b>Vivienda 2</b>
+                    <small id="note2">Sin lectura</small>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- CONTROLES EXCLUSIVOS DE LA DEMOSTRACION -->
+              <div id="demoControls" class="demo-controls" hidden>
+                <div class="control-heading">
+                  <b>Laboratorio visual</b>
+                  <span>SIMULACIÓN</span>
+                </div>
+                <label for="demoLevel">
+                  Nivel principal <output id="demoLevelValue">73%</output>
+                </label>
+                <input type="range" id="demoLevel" min="0" max="100" value="73">
+                <div class="demo-pumps">
+                  <button id="demoPump1" class="outline" aria-pressed="true">Ramal 1 · ON</button>
+                  <button id="demoPump2" class="outline" aria-pressed="true">Ramal 2 · ON</button>
+                </div>
+                <button id="demoReset" class="ghost" type="button">Restablecer simulación</button>
+                <small>Los interruptores de ramal y los niveles secundarios son ficticios; no accionan la bomba ni simulan la hidráulica real.</small>
+              </div>
+              <p class="footnote">El reparto es una meta de diseño, no una medición confirmada.</p>
             </article>
 
-            <article class="panel device-info">
-
-                <h2>Información del dispositivo</h2>
-
-                <div class="info-row">
-                    <span>Red WiFi actual</span>
-                    <strong id="wifiName">—</strong>
+            <!-- GRAFICA DE SEÑAL WIFI -->
+            <article class="panel signal">
+              <div class="card-title">
+                <div>
+                  <h2 class="icon-heading"><span data-icon="wifi"></span> Calidad de conexión</h2>
+                  <p>Últimas 30 muestras de esta sesión</p>
                 </div>
+              </div>
 
-                <div class="info-row">
-                    <span>Dirección IP</span>
-                    <strong id="ipAddress">—</strong>
+              <div class="signal-summary">
+                <div>
+                  <small>Intensidad recibida</small>
+                  <strong id="signalBig">—</strong>
                 </div>
-
-                <div class="info-row">
-                    <span>Última actualización</span>
-                    <strong id="lastUpdate">—</strong>
+                <div id="signalBars" class="signal-bars" aria-hidden="true">
+                  <i></i><i></i><i></i><i></i><i></i>
                 </div>
+              </div>
 
+              <div id="chartEmpty" class="chart-empty">Esperando lecturas reales</div>
+
+              <svg id="signalChart" viewBox="0 0 340 130" role="img" aria-label="Gráfica de intensidad WiFi" hidden>
+                <path d="M10 10 H330 M10 65 H330 M10 120 H330" class="chart-grid"/>
+                <defs>
+                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop stop-color="#19b6c2" stop-opacity=".35"/>
+                    <stop offset="1" stop-color="#19b6c2" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path id="signalArea" fill="url(#chartGradient)" d=""/>
+                <polyline id="signalLine" class="chart-line" points=""/>
+              </svg>
+
+              <div class="chart-legend">
+                <span>-100 dBm</span><span>-30 dBm</span>
+              </div>
+
+              <dl class="details">
+                <div><dt>Red WiFi</dt><dd id="wifiName">—</dd></div>
+                <div><dt>Dirección IP</dt><dd id="ipAddress">—</dd></div>
+                <div><dt>Dispositivo</dt><dd id="deviceName">—</dd></div>
+              </dl>
             </article>
-
+          </div>
         </section>
 
-        <!-- SENSORES -->
-
+        <!-- MONITOREO DE SENSORES -->
         <section id="monitor" class="page" hidden>
+          <div class="heading">
+            <div>
+              <span class="eyebrow">SENSORES Y ALMACENAMIENTO</span>
+              <h1>Monitoreo</h1>
+              <p class="muted">Estado de los componentes del prototipo.</p>
+            </div>
+          </div>
 
-            <div class="page-heading">
-                <span class="eyebrow">TELEMETRÍA</span>
-                <h1>Tinacos y sensores</h1>
-                <p class="muted">
-                    Mediciones enviadas por el ESP32.
-                </p>
+          <div class="panel">
+            <h2 class="icon-heading"><span data-icon="radar"></span> Lecturas de sensores</h2>
+
+            <div class="item">
+              <span class="item-icon" data-icon="radar"></span>
+              <div class="item-copy">
+                <b>Ultrasónicos · tres tinacos</b>
+                <small>Principal / Vivienda 1 / Vivienda 2</small>
+              </div>
+              <strong id="sensorUltra">Pendiente</strong>
             </div>
 
-            <div id="sensorCards" class="sensor-grid"></div>
+            <div class="item">
+              <span class="item-icon" data-icon="float"></span>
+              <div class="item-copy">
+                <b>Flotador · vivienda 1</b>
+                <small>Detecta un umbral, no un porcentaje</small>
+              </div>
+              <strong id="sensorFloat1">Pendiente</strong>
+            </div>
 
+            <div class="item">
+              <span class="item-icon" data-icon="float"></span>
+              <div class="item-copy">
+                <b>Flotador · vivienda 2</b>
+                <small>Detecta un umbral, no un porcentaje</small>
+              </div>
+              <strong id="sensorFloat2">Pendiente</strong>
+            </div>
+
+            <div class="item">
+              <span class="item-icon" data-icon="flow"></span>
+              <div class="item-copy">
+                <b>Caudalímetros YF-S401</b>
+                <small>Caudal y litros después de calibrar</small>
+              </div>
+              <strong id="sensorFlow">Pendiente</strong>
+            </div>
+          </div>
         </section>
 
-        <!-- DISTRIBUCIÓN -->
-
+        <!-- DISTRIBUCION -->
         <section id="distribution" class="page" hidden>
-
-            <div class="page-heading">
-                <span class="eyebrow">REPARTO DE AGUA</span>
-                <h1>Distribución</h1>
-                <p class="muted">
-                    Objetivo de reparto equitativo: 50% y 50%.
-                </p>
+          <div class="heading">
+            <div>
+              <span class="eyebrow">OPERACIÓN</span>
+              <h1>Distribución de agua</h1>
+              <p class="muted">Una bomba manual, dos ramales de distribución.</p>
             </div>
+          </div>
 
-            <article class="panel">
-                <h2>Distribución registrada</h2>
+          <div class="notice">
+            Bomba manual: el ESP32 no puede apagarla. Supervisa los tanques físicamente.
+          </div>
 
-                <div class="distribution-bar">
-                    <div id="share1"></div>
-                    <div id="share2"></div>
-                </div>
+          <p id="realDistribution" class="notice">Distribución pendiente de calibración</p>
 
-                <div id="distributionText" class="distribution-text">
-                    Pendiente de calibración
-                </div>
-
-                <p class="muted small">
-                    El reparto se calcula con los litros medidos.
-                    No representa un control automático.
-                </p>
+          <div class="two-grid">
+            <article class="panel pump-card">
+              <span class="metric-icon" data-icon="flow"></span>
+              <h2>Ramal 1</h2>
+              <p>Vivienda 1</p>
+              <strong id="pump1State">Sin configurar</strong>
+              <button disabled class="outline">Control no habilitado</button>
             </article>
+            <article class="panel pump-card">
+              <span class="metric-icon" data-icon="flow"></span>
+              <h2>Ramal 2</h2>
+              <p>Vivienda 2</p>
+              <strong id="pump2State">Sin configurar</strong>
+              <button disabled class="outline">Control no habilitado</button>
+            </article>
+          </div>
+        </section>
 
-            <div id="distributionCards"
-                 class="sensor-grid two">
+        <!-- PORTAL INDIVIDUAL -->
+        <section id="housing" class="page" hidden>
+          <div class="heading">
+            <div>
+              <span class="eyebrow">PORTAL DE VIVIENDA</span>
+              <h1 id="houseTitle">Mi vivienda</h1>
+              <p class="muted">Consulta exclusivamente la información de tu domicilio.</p>
             </div>
+          </div>
 
-            <div class="notice">
-                La bomba es manual. El sistema monitorea
-                los ramales, pero no regula el reparto físicamente.
-            </div>
-
+          <div class="metrics">
+            <article class="panel metric">
+              <span class="metric-icon" data-icon="flow"></span>
+              <small>Estado de suministro</small>
+              <strong id="houseSupply">Sin lectura</strong>
+            </article>
+            <article class="panel metric">
+              <span class="metric-icon" data-icon="float"></span>
+              <small>Flotador</small>
+              <strong id="houseFloat">Sin lectura</strong>
+            </article>
+            <article class="panel metric">
+              <span class="metric-icon" data-icon="drop"></span>
+              <small>Litros recibidos</small>
+              <strong id="houseLiters">—</strong>
+            </article>
+          </div>
+          <p class="notice" id="houseNotice">Esperando mediciones recientes de tu vivienda.</p>
         </section>
 
         <!-- HISTORIAL -->
-
         <section id="history" class="page" hidden>
-
-            <div class="page-heading">
-                <span class="eyebrow">REGISTROS</span>
-                <h1>Historial de conexión</h1>
-                <p class="muted">
-                    Últimas 200 muestras recibidas durante esta sesión.
-                </p>
+          <div class="heading">
+            <div>
+              <span class="eyebrow">REGISTROS</span>
+              <h1>Historial de conexión</h1>
+              <p class="muted">Muestras recibidas durante esta sesión. No es un histórico permanente.</p>
             </div>
+            <button id="export" class="primary">
+              <span data-icon="download"></span> Descargar CSV
+            </button>
+          </div>
 
-            <article class="panel">
-
-                <button id="exportHistory" class="primary">
-                    Descargar CSV
-                </button>
-
-                <div class="table-wrap">
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fecha y hora</th>
-                                <th>Señal WiFi</th>
-                                <th>Tiempo activo</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="historyRows"></tbody>
-                    </table>
-
-                </div>
-
-                <p id="historyEmpty" class="muted">
-                    Todavía no hay registros.
-                </p>
-
-            </article>
-
+          <article class="panel table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha y hora</th>
+                  <th>Señal</th>
+                  <th>Tiempo activo</th>
+                </tr>
+              </thead>
+              <tbody id="historyRows"></tbody>
+            </table>
+            <p id="historyEmpty" class="muted">Aún no hay registros.</p>
+          </article>
         </section>
 
         <!-- ALERTAS -->
-
         <section id="alerts" class="page" hidden>
-
-            <div class="page-heading">
-                <span class="eyebrow">SUPERVISIÓN</span>
-                <h1>Alertas del sistema</h1>
+          <div class="heading">
+            <div>
+              <span class="eyebrow">CENTRO DE AVISOS</span>
+              <h1>Alertas</h1>
             </div>
-
-            <div id="alertList" class="alert-list"></div>
-
+          </div>
+          <article class="panel">
+            <h2 class="icon-heading"><span data-icon="wifi"></span> Estado de comunicación</h2>
+            <p id="alertText">Esperando información.</p>
+          </article>
+          <article class="panel spaced">
+            <h2 class="icon-heading"><span data-icon="shield"></span> Protecciones de hardware</h2>
+            <p class="muted">Los flotadores detectan el umbral de llenado tras calibrarlos. La bomba es manual y no dispone de parada automática.</p>
+          </article>
         </section>
 
-        <!-- CONFIGURACIÓN -->
-
+        <!-- INFORMACION DEL SISTEMA -->
         <section id="settings" class="page" hidden>
-
-            <div class="page-heading">
-                <span class="eyebrow">INFORMACIÓN</span>
-                <h1>Configuración del sistema</h1>
+          <div class="heading">
+            <div>
+              <span class="eyebrow">ADMINISTRACIÓN</span>
+              <h1>Configuración</h1>
             </div>
+          </div>
 
-            <article class="panel">
-
-                <h2>Seguridad y funcionamiento</h2>
-
-                <div class="info-row">
-                    <span>Control remoto de bomba</span>
-                    <strong>No disponible</strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Cambio remoto de WiFi</span>
-                    <strong>Deshabilitado</strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Modo de operación</span>
-                    <strong>Monitoreo</strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Base de datos</span>
-                    <strong>Firebase Realtime Database</strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Microcontrolador</span>
-                    <strong>ESP32</strong>
-                </div>
-
-            </article>
-
+          <article class="panel">
+            <dl class="details">
+              <div><dt>Proyecto</dt><dd>AquaSolidaria</dd></div>
+              <div><dt>Capacidad de vivienda 2</dt><dd>200 ml (reportada); otros tinacos pendientes</dd></div>
+              <div><dt>Objetivo</dt><dd>50% / 50%</dd></div>
+              <div><dt>Acceso</dt><dd>Firebase Authentication</dd></div>
+              <div><dt>Gestión de cuentas</dt><dd>Consola de Firebase</dd></div>
+            </dl>
+            <p class="footnote">Los parámetros hidráulicos de esta etapa son informativos.</p>
+          </article>
         </section>
 
-        <!-- PANEL INDIVIDUAL DE VIVIENDAS -->
+      </div>
 
-        <section id="housing" class="page" hidden>
-
-            <div class="page-heading">
-                <span class="eyebrow">PORTAL DE VIVIENDA</span>
-                <h1 id="houseTitle">Mi vivienda</h1>
-                <p class="muted">
-                    Consulta exclusivamente los datos de tu tinaco.
-                </p>
-            </div>
-
-            <article class="panel">
-                <div id="personalTank"></div>
-            </article>
-
-            <div id="personalSensors"
-                 class="sensor-grid">
-            </div>
-
-        </section>
-
+      <footer class="app-footer">
+        <span data-icon="waves"></span>
+        AquaSolidaria · Cada gota cuenta · Edición Marea 4.1
+      </footer>
     </main>
+  </div>
 
-    <footer>
-        AquaSolidaria · Gestión inteligente del agua · 2026
-    </footer>
-
-</div>
-
-<script type="module" src="./app.js"></script>
-
+  <noscript>Activa JavaScript para utilizar AquaSolidaria.</noscript>
 </body>
 </html>
